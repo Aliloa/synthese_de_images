@@ -1,99 +1,87 @@
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 #include "glad/glad.h"
-#include "glbasimac/glbi_engine.hpp"
-#include "glbasimac/glbi_set_of_points.hpp"
+#include "draw_scene.hpp"
 #include "tools/shaders.hpp"
 #include <iostream>
-#include "glbasimac/glbi_convex_2D_shape.hpp"
+
 using namespace glbasimac;
 using namespace STP3D;
 
 /* Window properties */
-static const unsigned int WINDOW_WIDTH = 800;
+static const unsigned int WINDOW_WIDTH = 1200;
 static const unsigned int WINDOW_HEIGHT = 800;
-static const char WINDOW_TITLE[] = "The train";
+static const char WINDOW_TITLE[] = "TD04 Ex01";
 static float aspectRatio = 1.0f;
 
 /* Minimal time wanted between two images */
 static const double FRAMERATE_IN_SECONDS = 1. / 30.;
 
-/* Virtual windows space */
-static const float GL_VIEW_SIZE = 100.;
-
-const int N = 10;							// Grille NxN
-const float CELL_SIZE = 10.f; // Chaque case fait 10x10
-
-/* OpenGL Engine */
-GLBI_Engine myEngine;
-GLBI_Set_Of_Points gridLines;
-
-std::vector<float> origine = {0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.5f, -0.5f, -0.5f};
-std::vector<float> colors = {1.f, 1.f, 1.f, 1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f};
-
 /* Error handling function */
-void onError(int error, const char *description)
-{
-	std::cout << "GLFW Error (" << error << ") : " << description << std::endl;
+void onError(int error, const char* description) {
+	std::cout << "GLFW Error ("<<error<<") : " << description << std::endl;
 }
 
-void onWindowResized(GLFWwindow * /*window*/, int width, int height)
+void onWindowResized(GLFWwindow* /*window*/, int width, int height)
 {
-	aspectRatio = width / (float)height;
+	aspectRatio = width / (float) height;
 
 	glViewport(0, 0, width, height);
-	if (aspectRatio > 1)
-	{
-		myEngine.set2DProjection(-GL_VIEW_SIZE / 2. * aspectRatio, GL_VIEW_SIZE / 2. * aspectRatio,
-														 -GL_VIEW_SIZE / 2., GL_VIEW_SIZE / 2.);
-	}
-	else
-	{
-		myEngine.set2DProjection(-GL_VIEW_SIZE / 2., GL_VIEW_SIZE / 2.,
-														 -GL_VIEW_SIZE / 2. / aspectRatio, GL_VIEW_SIZE / 2. / aspectRatio);
-	}
+	std::cerr<<"Setting 3D projection"<<std::endl;
+	// TO DO EX01 part 2
 }
 
-void onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int /*mods*/)
+void onKey(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/)
 {
-	if (key == GLFW_KEY_A && action == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	int is_pressed = (action == GLFW_PRESS); 
+	switch(key) {
+		case GLFW_KEY_A :
+		case GLFW_KEY_ESCAPE :
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			break;
+		case GLFW_KEY_L:
+			if (is_pressed) glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+			break;
+		case GLFW_KEY_P:
+			if (is_pressed) glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+		// TO DO EX01 part 3
+
+
+
+		case GLFW_KEY_R :
+			//> EXO 3
+			//< FIN EXO 3
+			break;
+		case GLFW_KEY_T :
+			//> EXO 3
+			//< FIN EXO 3
+			break;
+		default: std::cerr<<"Touche non gérée "<<key<<std::endl;
 	}
+
 }
 
-void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
+void onMouseButton(GLFWwindow* window, int button, int action, int /*mods*/)
 {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-	{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
-		int width, height;
+		std::cout<<"Pressed in "<<xpos<<" "<<ypos<<std::endl;
+
 	}
 }
-void initScene()
-{
-	std::vector<float> origine = {0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.5f, -0.5f, -0.5f};
-	std::vector<float> colors = {1.f, 1.f, 1.f, 1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f};
-}
 
-void renderScene()
-{
-	glPointSize(4.0);
-}
-
-int main(int /*argc*/, char ** /*argv*/)
+int main(int /*argc*/, char** /*argv*/)
 {
 	/* GLFW initialisation */
-	GLFWwindow *window;
-	if (!glfwInit())
-		return -1;
+	GLFWwindow* window;
+	if (!glfwInit()) return -1;
 
-	/* Try to uncomment this for MAC OS if it did not work */
-	// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	// glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	// glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    /* Try to uncomment this for MAC OS if it did not work */
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	/* Callback to a function if an error is rised by GLFW */
 	glfwSetErrorCallback(onError);
@@ -110,34 +98,41 @@ int main(int /*argc*/, char ** /*argv*/)
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
 
-	std::cout << "Loading GL extension" << std::endl;
+	std::cout<<"Loading GL extension"<<std::endl;
 	// Intialize glad (loads the OpenGL functions)
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		return -1;
 	}
 
-	glfwSetWindowSizeCallback(window, onWindowResized);
+	glfwSetWindowSizeCallback(window,onWindowResized);
 	glfwSetKeyCallback(window, onKey);
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetMouseButtonCallback(window, onMouseButton);
 
-	std::cout << "Engine init" << std::endl;
+	std::cout<<"Engine init"<<std::endl;
+	// TO DO EX01 part 2
+
 	myEngine.initGL();
-	onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+	onWindowResized(window,WINDOW_WIDTH,WINDOW_HEIGHT);
 	CHECK_GL;
 
 	initScene();
+	double elapsedTime{0.0};
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
 		/* Get time (in second) at loop beginning */
 		double startTime = glfwGetTime();
 
-		/* Render here */
-		glClearColor(0.2f, 0.0, 0.0, 0.0);
-		glClear(GL_COLOR_BUFFER_BIT);
+		/* Render begins here */
+		glClearColor(0.f,0.0f,0.2f,0.0f);
 
-		renderScene();
+		// TO DO EX01 part 2
+
+		// TO DO EX01 part 3
+
+		
+		drawScene();
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -146,11 +141,11 @@ int main(int /*argc*/, char ** /*argv*/)
 		glfwPollEvents();
 
 		/* Elapsed time computation from loop begining */
-		double elapsedTime = glfwGetTime() - startTime;
+		elapsedTime = glfwGetTime() - startTime;
 		/* If to few time is spend vs our wanted FPS, we wait */
-		while (elapsedTime < FRAMERATE_IN_SECONDS)
+		while(elapsedTime < FRAMERATE_IN_SECONDS)
 		{
-			glfwWaitEventsTimeout(FRAMERATE_IN_SECONDS - elapsedTime);
+			glfwWaitEventsTimeout(FRAMERATE_IN_SECONDS-elapsedTime);
 			elapsedTime = glfwGetTime() - startTime;
 		}
 	}
