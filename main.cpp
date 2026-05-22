@@ -12,23 +12,21 @@ using namespace STP3D;
 /* Window properties */
 static const unsigned int WINDOW_WIDTH = 800;
 static const unsigned int WINDOW_HEIGHT = 800;
-static const char WINDOW_TITLE[] = "TD03 Ex01";
+static const char WINDOW_TITLE[] = "The train";
 static float aspectRatio = 1.0f;
 
 /* Minimal time wanted between two images */
 static const double FRAMERATE_IN_SECONDS = 1. / 30.;
 
 /* Virtual windows space */
-static const float GL_VIEW_SIZE = 100.0f;
+static const float GL_VIEW_SIZE = 100.;
+
+const int N = 10;							// Grille NxN
+const float CELL_SIZE = 10.f; // Chaque case fait 10x10
 
 /* OpenGL Engine */
 GLBI_Engine myEngine;
-GLBI_Set_Of_Points thePoints;
-GLBI_Convex_2D_Shape carre;
-GLBI_Convex_2D_Shape triangle;
-GLBI_Convex_2D_Shape cercle;
-GLBI_Convex_2D_Shape Trapeze;
-GLBI_Convex_2D_Shape rectangle;
+GLBI_Set_Of_Points gridLines;
 
 std::vector<float> origine = {0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.5f, -0.5f, -0.5f};
 std::vector<float> colors = {1.f, 1.f, 1.f, 1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f};
@@ -62,12 +60,6 @@ void onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int /*mods
 	{
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
-	if (key == GLFW_KEY_B && action == GLFW_PRESS)
-	{
-		{
-			thePoints.changeNature(GL_LINE_STRIP);
-		}
-	}
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
@@ -77,115 +69,17 @@ void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 		int width, height;
-
-		glfwGetWindowSize(window, &width, &height);
-		float cordx = (xpos - width / 2) * GL_VIEW_SIZE / height;
-		float cordy = -(ypos - height / 2) * GL_VIEW_SIZE / height;
-		std::vector<float> coord = {cordx, cordy};
-		std::vector<float> colors = {1.f, 1.f, 1.f};
-		thePoints.addAPoint(coord.data(), colors.data());
 	}
 }
 void initScene()
 {
-	std::vector<float> pointsCarre = {
-			-0.5f, -0.5f,
-			0.5f, -0.5f,
-			0.5f, 0.5f,
-			-0.5f, 0.5f};
-
-	carre.initShape(pointsCarre);
-
-	std::vector<float> pointscercle;
-	const int N = 50;
-
-	pointscercle.push_back(0.0f);
-	pointscercle.push_back(0.0f);
-
-	for (int i = 0; i <= N; i++)
-	{
-		float angle = 2.0f * M_PI * i / N;
-		float x = cos(angle);
-		float y = sin(angle);
-
-		pointscercle.push_back(x);
-		pointscercle.push_back(y);
-	}
-
-	cercle.initShape(pointscercle);
-	cercle.changeNature(GL_TRIANGLE_FAN);
-
-	std::vector<float> pointsTrapeze = {
-			60.0f,
-			-10.0f,
-			0.0f,
-			-20.0f,
-			0.0f,
-			20.0f,
-			60.0f,
-			10.0f,
-	};
-
-	Trapeze.initShape(pointsTrapeze);
-	Trapeze.changeNature(GL_TRIANGLE_FAN);
-
-	std::vector<float> pointsrectangle = {
-			-3.0f,
-			5.0f,
-			48.0f,
-			3.0f,
-			48.0f,
-			-3.0f,
-			2.0f,
-			-5.0f,
-	};
-
-	rectangle.initShape(pointsrectangle);
-	rectangle.changeNature(GL_TRIANGLE_FAN);
-}
-
-void drawFirstArm()
-{
-
-	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.mvMatrixStack.addHomothety(20);
-	myEngine.updateMvMatrix();
-	cercle.drawShape();
-	myEngine.mvMatrixStack.popMatrix();
-
-	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.mvMatrixStack.addTranslation(Vector3D(60.0f, 0.0f, 0.0f));
-	myEngine.mvMatrixStack.addHomothety(10);
-	myEngine.updateMvMatrix();
-	cercle.drawShape();
-	myEngine.mvMatrixStack.popMatrix();
-
-	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.updateMvMatrix();
-	Trapeze.drawShape();
-	myEngine.mvMatrixStack.popMatrix();
-}
-void drawRoundedSquare()
-{
-	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.updateMvMatrix();
-	carre.drawShape();
-	myEngine.mvMatrixStack.popMatrix();
-}
-void drawSecondArm()
-{
-	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.updateMvMatrix();
-	rectangle.drawShape();
-	myEngine.mvMatrixStack.popMatrix();
+	std::vector<float> origine = {0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.5f, -0.5f, -0.5f};
+	std::vector<float> colors = {1.f, 1.f, 1.f, 1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f};
 }
 
 void renderScene()
 {
-	myEngine.setFlatColor(1.0f, 1.0f, 1.0f);
-	// drawFirstArm();
-	drawRoundedSquare();
-	drawSecondArm();
+	glPointSize(4.0);
 }
 
 int main(int /*argc*/, char ** /*argv*/)
