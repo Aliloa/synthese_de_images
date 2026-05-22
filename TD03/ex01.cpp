@@ -1,4 +1,4 @@
-0 #define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 #include "glad/glad.h"
 #include "glbasimac/glbi_engine.hpp"
@@ -6,8 +6,7 @@
 #include "tools/shaders.hpp"
 #include <iostream>
 #include "glbasimac/glbi_convex_2D_shape.hpp"
-
-		using namespace glbasimac;
+using namespace glbasimac;
 using namespace STP3D;
 
 /* Window properties */
