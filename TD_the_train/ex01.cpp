@@ -118,6 +118,7 @@ int main(int /*argc*/, char** /*argv*/)
 	CHECK_GL;
 
 	initScene();
+	glEnable(GL_DEPTH_TEST);
 	double elapsedTime{0.0};
 
 	/* Loop until the user closes the window */

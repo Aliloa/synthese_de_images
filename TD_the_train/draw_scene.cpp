@@ -1,46 +1,91 @@
 #include "draw_scene.hpp"
-#include <cmath>
 
 /// Camera parameters
 float angle_theta{45.0}; // Angle between x axis and viewpoint
 float angle_phy{30.0};	 // Angle between z axis and viewpoint
-float dist_zoom{150.0};	 // Distance between origin and viewpoint
+float dist_zoom{100.0};	 // Distance between origin and viewpoint
 
 GLBI_Engine myEngine;
+GLBI_Set_Of_Points somePoints(3);
+GLBI_Convex_2D_Shape ground{3};
 
-// Taille du terrain
-static const int N = 10;
-static const float CELL = 10.0f;
+GLBI_Set_Of_Points frame{3};
+IndexedMesh *sphere;
+float rotation{0};
+
+GLBI_Convex_2D_Shape cercle{3};
+StandardMesh *cone;
 
 void initScene()
 {
-	glEnable(GL_DEPTH_TEST);
-}
+	std::vector<float> points{0.0, 0.0, 0.0};
+	somePoints.initSet(points, 1.0, 1.0, 1.0);
 
-void drawTerrain()
-{
-	myEngine.setFlatColor(0.3f, 0.65f, 0.3f);
+	//  case 10x10
+	std::vector<float> baseCarre{
+		0.0, 0.0, 0.0,
+		10.0, 0.0, 0.0,
+		10.0, 10.0, 0.0,
+		0.0, 10.0, 0.0};
 
-	glBegin(GL_QUADS);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(100.0f, 0.0f, 0.0f);
-	glVertex3f(100.0f, 0.0f, 100.0f);
-	glVertex3f(0.0f, 0.0f, 100.0f);
-	glEnd();
+	ground.initShape(baseCarre);
+	ground.changeNature(GL_TRIANGLE_FAN);
+
+	// FRAME
+	frame.changeNature(GL_LINES);
+
 }
 
 void drawScene()
 {
-	// Projection
-	Matrix4D proj = Matrix4D::perspective(60.0f, 1200.0f / 800.0f, 0.1f, 500.0f);
-	myEngine.set3DProjection(60.0f, 1200.0f / 800.0f, 0.1f, 500.0f);
+	// Positionnement caméra en coordonnées sphériques
+	float cam_x = dist_zoom * cos(angle_phy * M_PI / 180.f) * cos(angle_theta * M_PI / 180.f);
+	float cam_y = dist_zoom * cos(angle_phy * M_PI / 180.f) * sin(angle_theta * M_PI / 180.f);
+	float cam_z = dist_zoom * sin(angle_phy * M_PI / 180.f);
 
-	// Caméra : position (50, 80, 150) regarde le centre du terrain (50, 0, 50)
-	Matrix4D view = Matrix4D::lookAt(
-		Vector3D(50.0f, 50.0f, 200.0f), // plus loin et moins haute
-		Vector3D(50.0f, 0.0f, 50.0f),
-		Vector3D(0.0f, 1.0f, 0.0f));
-	myEngine.setViewMatrix(view);
+	// Création de la matrice lookAt avec STP3D::Matrix4D
+	STP3D::Matrix4D viewMatrix = STP3D::Matrix4D::lookAt(
+		STP3D::Vector3D(cam_x, cam_y, cam_z), // position caméra
+		STP3D::Vector3D(0.f, 0.f, 0.f),		  // point regardé
+		STP3D::Vector3D(0.f, 0.f, 1.f)		  // vecteur haut (Z vers le haut)
+	);
+
+	// Appliquer la matrice de vue au moteur
+	myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 	myEngine.updateMvMatrix();
-	drawTerrain();
+
+	glPointSize(10.0);
+
+	// drawFrame();
+
+	myEngine.setFlatColor(0.31, 0.459, 0.267);
+	const int N = 10;
+	const float CASE_SIZE = 10.0f;
+
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			myEngine.mvMatrixStack.pushMatrix();
+			// decalage des cases
+			myEngine.mvMatrixStack.addTranslation({(i - N / 2) * CASE_SIZE,
+												   (j - N / 2) * CASE_SIZE,
+												   0.0f});
+			myEngine.updateMvMatrix();
+
+			// cases qui alternent entre deux verts
+			if ((i + j) % 2 == 0)
+			{
+				myEngine.setFlatColor(0.31f, 0.459f, 0.267f); // vert clair
+			}
+			else
+			{
+				myEngine.setFlatColor(0.267, 0.412, 0.227); // vert foncé
+			}
+			ground.drawShape();
+
+			myEngine.mvMatrixStack.popMatrix();
+			myEngine.updateMvMatrix();
+		}
+	}
 }

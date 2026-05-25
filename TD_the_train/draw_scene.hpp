@@ -19,7 +19,4 @@ extern GLBI_Engine myEngine;
 
 void initScene();
 
-void drawTerrain();
-
 void drawScene();
-
