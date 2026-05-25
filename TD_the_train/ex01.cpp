@@ -113,6 +113,7 @@ int main(int /*argc*/, char** /*argv*/)
 	std::cout<<"Engine init"<<std::endl;
 	// TO DO EX01 part 2
 
+	myEngine.mode2D = false;
 	myEngine.initGL();
 	onWindowResized(window,WINDOW_WIDTH,WINDOW_HEIGHT);
 	CHECK_GL;

@@ -4,8 +4,8 @@
 
 /// Camera parameters
 float angle_theta{45.0}; // Angle between x axis and viewpoint
-float angle_phy{20.0};	 // Angle between z axis and viewpoint
-float dist_zoom{40.0};	 // Distance between origin and viewpoint
+float angle_phy{30.0};	 // Angle between z axis and viewpoint
+float dist_zoom{30.0};	 // Distance between origin and viewpoint
 
 GLBI_Engine myEngine;
 GLBI_Set_Of_Points somePoints(3);
@@ -71,6 +71,7 @@ void drawRailDroit()
 {
 	myEngine.mvMatrixStack.pushMatrix();
 	myEngine.mvMatrixStack.addTranslation({5.f, 5.f, 10.f});
+	myEngine.mvMatrixStack.addRotation(M_PI / 2.f, {1.f, 0.f, 0.f});
 	myEngine.updateMvMatrix();
 	myEngine.setFlatColor(1.f, 0.f, 0.f);
 	cube->draw();
