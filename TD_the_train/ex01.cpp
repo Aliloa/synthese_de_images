@@ -11,7 +11,7 @@ using namespace STP3D;
 /* Window properties */
 static const unsigned int WINDOW_WIDTH = 1200;
 static const unsigned int WINDOW_HEIGHT = 800;
-static const char WINDOW_TITLE[] = "TD04 Ex01";
+static const char WINDOW_TITLE[] = "The train";
 static float aspectRatio = 1.0f;
 
 /* Minimal time wanted between two images */
@@ -29,6 +29,8 @@ void onWindowResized(GLFWwindow* /*window*/, int width, int height)
 	glViewport(0, 0, width, height);
 	std::cerr<<"Setting 3D projection"<<std::endl;
 	// TO DO EX01 part 2
+	myEngine.set3DProjection(60.0f, aspectRatio, 0.1f, 500.0f);
+
 }
 
 void onKey(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/)
@@ -125,10 +127,10 @@ int main(int /*argc*/, char** /*argv*/)
 		double startTime = glfwGetTime();
 
 		/* Render begins here */
-		glClearColor(0.f,0.0f,0.2f,0.0f);
-
+glClearColor(0.5f, 0.7f, 0.9f, 1.0f);
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// TO DO EX01 part 2
-
+myEngine.set3DProjection(60.0f, aspectRatio, 0.1f, 500.0f);
 		// TO DO EX01 part 3
 
 		

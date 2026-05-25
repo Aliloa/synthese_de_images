@@ -19,13 +19,7 @@ extern GLBI_Engine myEngine;
 
 void initScene();
 
-void drawFrame();
-
-void drawBase();
-
-void drawArm();
-
-void drawPan();
+void drawTerrain();
 
 void drawScene();
 
