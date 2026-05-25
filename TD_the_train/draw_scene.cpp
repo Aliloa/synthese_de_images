@@ -1,11 +1,11 @@
 #include "draw_scene.hpp"
-#include <fstream>   // pour std::ifstream
-#include <iostream>  // pour les erreurs éventuelles
+#include <fstream>	// pour std::ifstream
+#include <iostream> // pour les erreurs éventuelles
 
 /// Camera parameters
 float angle_theta{45.0}; // Angle between x axis and viewpoint
-float angle_phy{30.0};	 // Angle between z axis and viewpoint
-float dist_zoom{100.0};	 // Distance between origin and viewpoint
+float angle_phy{20.0};	 // Angle between z axis and viewpoint
+float dist_zoom{40.0};	 // Distance between origin and viewpoint
 
 GLBI_Engine myEngine;
 GLBI_Set_Of_Points somePoints(3);
@@ -13,14 +13,40 @@ GLBI_Convex_2D_Shape ground{3};
 
 GLBI_Set_Of_Points frame{3};
 IndexedMesh *sphere;
-float rotation{0};
+IndexedMesh *railCylinder;
+IndexedMesh *traverse;
+IndexedMesh *cube;
 
 GLBI_Convex_2D_Shape cercle{3};
 StandardMesh *cone;
 
+Circuit circuit;
+
+void loadCircuit(const std::string &filename)
+{
+	// Ouvrir et parser le fichier JSON
+	std::ifstream file(filename);
+	if (!file.is_open())
+	{
+		std::cerr << "Impossible d'ouvrir : " << filename << std::endl;
+		return;
+	}
+	nlohmann::json j = nlohmann::json::parse(file);
+
+	// Remplir la structure
+	circuit.size_grid = j["size_grid"];
+	circuit.origin = {j["origin"][0], j["origin"][1]};
+
+	circuit.path.clear();
+	for (auto &point : j["path"])
+	{
+		circuit.path.push_back({point[0], point[1]});
+	}
+}
 
 void initScene()
 {
+	loadCircuit("../TD_the_train/circuit.json");
 	std::vector<float> points{0.0, 0.0, 0.0};
 	somePoints.initSet(points, 1.0, 1.0, 1.0);
 
@@ -37,6 +63,19 @@ void initScene()
 	// FRAME
 	frame.changeNature(GL_LINES);
 
+	cube = basicCube(1.0f);
+	cube->createVAO();
+}
+
+void drawRailDroit()
+{
+	myEngine.mvMatrixStack.pushMatrix();
+	myEngine.mvMatrixStack.addTranslation({5.f, 5.f, 10.f});
+	myEngine.updateMvMatrix();
+	myEngine.setFlatColor(1.f, 0.f, 0.f);
+	cube->draw();
+	myEngine.mvMatrixStack.popMatrix();
+	myEngine.updateMvMatrix();
 }
 
 void drawScene()
@@ -91,4 +130,19 @@ void drawScene()
 			myEngine.updateMvMatrix();
 		}
 	}
+
+	drawRailDroit();
+
+	// for (auto &[cx, cy] : circuit.path)
+	// {
+	// 	myEngine.mvMatrixStack.pushMatrix();
+	// 	myEngine.mvMatrixStack.addTranslation({cx * CASE_SIZE, // pas de centrage ici, les coords JSON sont directes
+	// 										   cy * CASE_SIZE,
+	// 										   0.01f});
+	// 	myEngine.updateMvMatrix();
+	// 	myEngine.setFlatColor(1.f, 0.f, 0.f);
+	// 	ground.drawShape();
+	// 	myEngine.mvMatrixStack.popMatrix();
+	// 	myEngine.updateMvMatrix();
+	// }
 }
