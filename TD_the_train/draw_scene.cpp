@@ -1,4 +1,6 @@
 #include "draw_scene.hpp"
+#include <fstream>   // pour std::ifstream
+#include <iostream>  // pour les erreurs éventuelles
 
 /// Camera parameters
 float angle_theta{45.0}; // Angle between x axis and viewpoint
@@ -15,6 +17,7 @@ float rotation{0};
 
 GLBI_Convex_2D_Shape cercle{3};
 StandardMesh *cone;
+
 
 void initScene()
 {
