@@ -5,7 +5,7 @@
 /// Camera parameters
 float angle_theta{45.0}; // Angle between x axis and viewpoint
 float angle_phy{30.0};	 // Angle between z axis and viewpoint
-float dist_zoom{30.0};	 // Distance between origin and viewpoint
+float dist_zoom{70.0};	 // Distance between origin and viewpoint
 
 GLBI_Engine myEngine;
 GLBI_Set_Of_Points somePoints(3);
@@ -13,7 +13,7 @@ GLBI_Convex_2D_Shape ground{3};
 
 GLBI_Set_Of_Points frame{3};
 IndexedMesh *sphere;
-IndexedMesh *railCylinder;
+IndexedMesh *cylinder;
 IndexedMesh *traverse;
 IndexedMesh *cube;
 
@@ -65,18 +65,49 @@ void initScene()
 
 	cube = basicCube(1.0f);
 	cube->createVAO();
+
+	cylinder = basicCylinder(1.0f, 1.0f);
+	cylinder->createVAO();
 }
+
+const float POS_X_RAIL1 = 3.f; //rail1
+const float POS_X_RAIL2 = 7.f; // rail 2
+const float sr = 0.5f; //epaisseur du rail
+const float sx = 0.7f; //position des balast
+const float rr = 0.3f;// rayon du ballast
 
 void drawRailDroit()
 {
+	// ----------------Rail 1
 	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.mvMatrixStack.addTranslation({5.f, 5.f, 10.f});
-	myEngine.mvMatrixStack.addRotation(M_PI / 2.f, {1.f, 0.f, 0.f});
-	myEngine.updateMvMatrix();
-	myEngine.setFlatColor(1.f, 0.f, 0.f);
-	cube->draw();
-	myEngine.mvMatrixStack.popMatrix();
-	myEngine.updateMvMatrix();
+		myEngine.mvMatrixStack.addTranslation({5.f, POS_X_RAIL1, 0.f});
+		myEngine.mvMatrixStack.addHomothety({10.0f, sr, sr});
+		myEngine.updateMvMatrix();
+		myEngine.setFlatColor(0.706f, 0.753f, 0.761f);
+		cube->draw();
+		myEngine.mvMatrixStack.popMatrix();
+	
+	//----------------Rail 2
+	myEngine.mvMatrixStack.pushMatrix();
+		myEngine.mvMatrixStack.addTranslation({5.0f, POS_X_RAIL2, 0.f});
+		myEngine.mvMatrixStack.addHomothety({10.0f, sr, sr});
+		myEngine.updateMvMatrix();
+		cube->draw();
+		myEngine.mvMatrixStack.popMatrix();
+		myEngine.updateMvMatrix();
+
+	//---------------Ballasts
+		myEngine.setFlatColor(0.431f, 0.357f, 0.278f);
+		for (int i=0; i<5; i++){
+			float posX = sx + i * (sx * 2.f + rr * 2.f);
+			myEngine.mvMatrixStack.pushMatrix();
+			myEngine.mvMatrixStack.addTranslation({posX, 2, -sr});
+			myEngine.mvMatrixStack.addHomothety({rr, 6, rr}); // rayon rr, hauteur 6
+			myEngine.updateMvMatrix();
+			cylinder->draw();
+			myEngine.mvMatrixStack.popMatrix();
+        	myEngine.updateMvMatrix();
+		}
 }
 
 void drawScene()
@@ -132,6 +163,7 @@ void drawScene()
 		}
 	}
 
+	myEngine.mvMatrixStack.addTranslation({0, 0, 5});
 	drawRailDroit();
 
 	// for (auto &[cx, cy] : circuit.path)

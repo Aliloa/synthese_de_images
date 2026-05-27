@@ -1,0 +1,12 @@
+calcul distance entre les balasts: 
+sx + i * (sx * 2.f + rr * 2.f)
+sx=valeur espacement
+rr=rayon de la balast
+problème ca ne commence pas à 2 et ca ne finit pas à 8
+
+autre idée: 
+float posX = 2 + i * (8 - 2) / (5 - 1);	
+2 = premiere balast 
+8= derneire balast
+5= nb total de balast
+et a chaque fois on en place une au milieu des 2 (marche pas très bien)
