@@ -10,3 +10,11 @@ float posX = 2 + i * (8 - 2) / (5 - 1);
 8= derneire balast
 5= nb total de balast
 et a chaque fois on en place une au milieu des 2 (marche pas très bien)
+
+calcul position et angles des ballasts dans le rail courbé:
+//3 angles pour 3 ballasts en partant de pi/12 et en tournant de pi/7 à chaqur fois
+float angle = angleStart + i * angleStep;
+
+//avec le cercle trigo on fait cos de la'angle pour avoir les valuers 2pi/2 1/2 3pi/2 etc et on multiplie par le rayon
+		float posY = (POS_X_RAIL1 - 0.6) * cos(angle); // position en x d'après le cercle trigo
+		float posX = (POS_X_RAIL1 - 0.6) * sin(angle);

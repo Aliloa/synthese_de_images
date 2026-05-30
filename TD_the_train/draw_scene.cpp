@@ -102,8 +102,8 @@ void drawRailDroit()
 	{
 		float posX = sx + i * (sx * 2.f + rr * 2.f);
 		myEngine.mvMatrixStack.pushMatrix();
-		myEngine.mvMatrixStack.addTranslation({posX, 2, -sr});
-		myEngine.mvMatrixStack.addHomothety({rr, 6, rr}); // rayon rr, hauteur 6
+		myEngine.mvMatrixStack.addTranslation({posX, 2, -sr}); //-sr pour qu'il soit bein en bas du rail
+		myEngine.mvMatrixStack.addHomothety({rr, 6, rr});	   // rayon rr, hauteur 6
 		myEngine.updateMvMatrix();
 		cylinder->draw();
 		myEngine.mvMatrixStack.popMatrix();
@@ -129,8 +129,8 @@ void drawRailCourbeInt(float rayon)
 		float xe = (rayon + sr) * cos_a; // extérieur
 		float yi = rayon * sin_a;
 		float ye = (rayon + sr) * sin_a;
-		float zb = 0.0f; // bas
-		float zh = sr;	 // haut
+		float zb = -sr / 2.0f; // bas
+		float zh = sr / 2.0f;// haut
 
 		// Face du dessus  (z = sr)
 		haut.insert(haut.end(), {xi, yi, zh, xe, ye, zh});
@@ -161,7 +161,26 @@ void drawRailCourbeInt(float rayon)
 
 void drawBallastsRailCourbe()
 {
-//-
+	//---------------Ballasts
+	myEngine.setFlatColor(0.431f, 0.357f, 0.278f);
+	float angleStart = M_PI / 12; // permiere ballast
+	float angleStep = M_PI / 7;	  // ecart entre chaque ballast
+	for (int i = 0; i < 3; i++)
+	{
+		float angle = angleStart + i * angleStep;
+		// POS_X_RAIL1 - 0.6 pour décaler et un peu centrer la ballast
+		float posY = (POS_X_RAIL1 - 0.6) * cos(angle); // position en x d'après le cercle trigo
+		float posX = (POS_X_RAIL1 - 0.6) * sin(angle); // position en y
+
+		myEngine.mvMatrixStack.pushMatrix();
+		myEngine.mvMatrixStack.addTranslation({posX, posY, -sr});
+		myEngine.mvMatrixStack.addRotation(-angle, {0, 0, 1});
+		myEngine.mvMatrixStack.addHomothety({rr, 6, rr}); // rayon rr, hauteur 6
+		myEngine.updateMvMatrix();
+		cylinder->draw();
+		myEngine.mvMatrixStack.popMatrix();
+		myEngine.updateMvMatrix();
+	}
 }
 
 void drawRailCourbe()
@@ -181,8 +200,8 @@ void drawScene()
 	// Création de la matrice lookAt avec STP3D::Matrix4D
 	STP3D::Matrix4D viewMatrix = STP3D::Matrix4D::lookAt(
 		STP3D::Vector3D(cam_x, cam_y, cam_z), // position caméra
-		STP3D::Vector3D(0.f, 0.f, 0.f),		  // point regardé
-		STP3D::Vector3D(0.f, 0.f, 1.f)		  // vecteur haut (Z vers le haut)
+		STP3D::Vector3D(0.f, 0.f, 0.f), // point regardé
+		STP3D::Vector3D(0.f, 0.f, 1.f) // vecteur haut (Z vers le haut)
 	);
 
 	// Appliquer la matrice de vue au moteur
@@ -197,35 +216,38 @@ void drawScene()
 	const int N = 10;
 	const float CASE_SIZE = 10.0f;
 
-	// for (int i = 0; i < N; i++)
-	// {
-	// 	for (int j = 0; j < N; j++)
-	// 	{
-	// 		myEngine.mvMatrixStack.pushMatrix();
-	// 		// decalage des cases
-	// 		myEngine.mvMatrixStack.addTranslation({(i - N / 2) * CASE_SIZE,
-	// 											   (j - N / 2) * CASE_SIZE,
-	// 											   0.0f});
-	// 		myEngine.updateMvMatrix();
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			myEngine.mvMatrixStack.pushMatrix();
+			// decalage des cases
+			myEngine.mvMatrixStack.addTranslation({(i - N / 2) * CASE_SIZE,
+												   (j - N / 2) * CASE_SIZE,
+												   0.0f});
+			myEngine.updateMvMatrix();
 
-	// 		// cases qui alternent entre deux verts
-	// 		if ((i + j) % 2 == 0)
-	// 		{
-	// 			myEngine.setFlatColor(0.31f, 0.459f, 0.267f); // vert clair
-	// 		}
-	// 		else
-	// 		{
-	// 			myEngine.setFlatColor(0.267, 0.412, 0.227); // vert foncé
-	// 		}
-	// 		ground.drawShape();
+			// cases qui alternent entre deux verts
+			if ((i + j) % 2 == 0)
+			{
+				myEngine.setFlatColor(0.31f, 0.459f, 0.267f); // vert clair
+			}
+			else
+			{
+				myEngine.setFlatColor(0.267, 0.412, 0.227); // vert foncé
+			}
+			ground.drawShape();
 
-	// 		myEngine.mvMatrixStack.popMatrix();
-	// 		myEngine.updateMvMatrix();
-	// 	}
-	// }
+			myEngine.mvMatrixStack.popMatrix();
+			myEngine.updateMvMatrix();
+		}
+	}
 
-	// myEngine.mvMatrixStack.addTranslation({0, 0, 5});
-	// drawRailDroit();
+	myEngine.mvMatrixStack.addTranslation({0,0, 1});
+	myEngine.updateMvMatrix();
+	drawRailDroit();
+	myEngine.mvMatrixStack.addTranslation({10,0, 0});
+	myEngine.updateMvMatrix();
 	drawRailCourbe();
 
 	// for (auto &[cx, cy] : circuit.path)
