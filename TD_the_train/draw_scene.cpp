@@ -1,4 +1,6 @@
 #include "draw_scene.hpp"
+#include "objects/draw_rail.hpp"
+#include "objects/draw_ground.hpp"
 #include <fstream>	// pour std::ifstream
 #include <iostream> // pour les erreurs éventuelles
 
@@ -8,18 +10,6 @@ float angle_phy{30.0};	 // Angle between z axis and viewpoint
 float dist_zoom{30.0};	 // Distance between origin and viewpoint
 
 GLBI_Engine myEngine;
-GLBI_Set_Of_Points somePoints(3);
-GLBI_Convex_2D_Shape ground{3};
-
-GLBI_Set_Of_Points frame{3};
-IndexedMesh *sphere;
-IndexedMesh *cylinder;
-IndexedMesh *traverse;
-IndexedMesh *cube;
-GLBI_Convex_2D_Shape rail_courbe{3};
-
-StandardMesh *cone;
-
 Circuit circuit;
 
 void loadCircuit(const std::string &filename)
@@ -48,146 +38,9 @@ void initScene()
 {
 	loadCircuit("../TD_the_train/circuit.json");
 	std::vector<float> points{0.0, 0.0, 0.0};
-	somePoints.initSet(points, 1.0, 1.0, 1.0);
 
-	//  case 10x10
-	std::vector<float> baseCarre{
-		0.0, 0.0, 0.0,
-		10.0, 0.0, 0.0,
-		10.0, 10.0, 0.0,
-		0.0, 10.0, 0.0};
-
-	ground.initShape(baseCarre);
-	ground.changeNature(GL_TRIANGLE_FAN);
-
-	// FRAME
-	frame.changeNature(GL_LINES);
-
-	cube = basicCube(1.0f);
-	cube->createVAO();
-
-	cylinder = basicCylinder(1.0f, 1.0f);
-	cylinder->createVAO();
-}
-
-const float POS_X_RAIL1 = 3.f; // rail1
-const float POS_X_RAIL2 = 7.f; // rail 2
-const float sr = 0.5f;		   // epaisseur du rail
-const float sx = 0.7f;		   // position des balast
-const float rr = 0.3f;		   // rayon du ballast
-
-void drawRailDroit()
-{
-	// ----------------Rail 1
-	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.mvMatrixStack.addTranslation({5.f, POS_X_RAIL1, 0.f});
-	myEngine.mvMatrixStack.addHomothety({10.0f, sr, sr});
-	myEngine.updateMvMatrix();
-	myEngine.setFlatColor(0.706f, 0.753f, 0.761f);
-	cube->draw();
-	myEngine.mvMatrixStack.popMatrix();
-
-	//----------------Rail 2
-	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.mvMatrixStack.addTranslation({5.0f, POS_X_RAIL2, 0.f});
-	myEngine.mvMatrixStack.addHomothety({10.0f, sr, sr});
-	myEngine.updateMvMatrix();
-	cube->draw();
-	myEngine.mvMatrixStack.popMatrix();
-	myEngine.updateMvMatrix();
-
-	//---------------Ballasts
-	myEngine.setFlatColor(0.431f, 0.357f, 0.278f);
-	for (int i = 0; i < 5; i++)
-	{
-		float posX = sx + i * (sx * 2.f + rr * 2.f);
-		myEngine.mvMatrixStack.pushMatrix();
-		myEngine.mvMatrixStack.addTranslation({posX, 2, -sr}); //-sr pour qu'il soit bein en bas du rail
-		myEngine.mvMatrixStack.addHomothety({rr, 6, rr});	   // rayon rr, hauteur 6
-		myEngine.updateMvMatrix();
-		cylinder->draw();
-		myEngine.mvMatrixStack.popMatrix();
-		myEngine.updateMvMatrix();
-	}
-}
-
-void drawRailCourbeInt(float rayon)
-{
-
-	std::vector<float> haut, bas, gauche, droite;
-
-	for (int i = 0; i <= 10; i++)
-	{
-		float t = (float)i / 10;
-		float angle = M_PI / 2.0f * (1.0f - t); // de 90° à 0°
-
-		float cos_a = cos(angle);
-		float sin_a = sin(angle);
-
-		// Les 4 coins de la section à ce point
-		float xi = rayon * cos_a;		 // intérieur
-		float xe = (rayon + sr) * cos_a; // extérieur
-		float yi = rayon * sin_a;
-		float ye = (rayon + sr) * sin_a;
-		float zb = -sr / 2.0f; // bas
-		float zh = sr / 2.0f;// haut
-
-		// Face du dessus  (z = sr)
-		haut.insert(haut.end(), {xi, yi, zh, xe, ye, zh});
-		// Face du dessous (z = 0)
-		bas.insert(bas.end(), {xi, yi, zb, xe, ye, zb});
-		// Face intérieure (rayon r)
-		gauche.insert(gauche.end(), {xi, yi, zb, xi, yi, zh});
-		// Face extérieure (rayon r+sr)
-		droite.insert(droite.end(), {xe, ye, zb, xe, ye, zh});
-	}
-
-	GLBI_Convex_2D_Shape fHaut(3), fBas(3), fGauche(3), fDroite(3);
-	fHaut.initShape(haut);
-	fHaut.changeNature(GL_TRIANGLE_STRIP);
-	fBas.initShape(bas);
-	fBas.changeNature(GL_TRIANGLE_STRIP);
-	fGauche.initShape(gauche);
-	fGauche.changeNature(GL_TRIANGLE_STRIP);
-	fDroite.initShape(droite);
-	fDroite.changeNature(GL_TRIANGLE_STRIP);
-
-	myEngine.setFlatColor(0.706f, 0.753f, 0.761f);
-	fHaut.drawShape();
-	fBas.drawShape();
-	fGauche.drawShape();
-	fDroite.drawShape();
-}
-
-void drawBallastsRailCourbe()
-{
-	//---------------Ballasts
-	myEngine.setFlatColor(0.431f, 0.357f, 0.278f);
-	float angleStart = M_PI / 12; // permiere ballast
-	float angleStep = M_PI / 7;	  // ecart entre chaque ballast
-	for (int i = 0; i < 3; i++)
-	{
-		float angle = angleStart + i * angleStep;
-		// POS_X_RAIL1 - 0.6 pour décaler et un peu centrer la ballast
-		float posY = (POS_X_RAIL1 - 0.6) * cos(angle); // position en x d'après le cercle trigo
-		float posX = (POS_X_RAIL1 - 0.6) * sin(angle); // position en y
-
-		myEngine.mvMatrixStack.pushMatrix();
-		myEngine.mvMatrixStack.addTranslation({posX, posY, -sr});
-		myEngine.mvMatrixStack.addRotation(-angle, {0, 0, 1});
-		myEngine.mvMatrixStack.addHomothety({rr, 6, rr}); // rayon rr, hauteur 6
-		myEngine.updateMvMatrix();
-		cylinder->draw();
-		myEngine.mvMatrixStack.popMatrix();
-		myEngine.updateMvMatrix();
-	}
-}
-
-void drawRailCourbe()
-{
-	drawRailCourbeInt(POS_X_RAIL1);
-	drawRailCourbeInt(POS_X_RAIL2);
-	drawBallastsRailCourbe();
+	initGround();
+	initRail();
 }
 
 void drawScene()
@@ -208,40 +61,7 @@ void drawScene()
 	myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 	myEngine.updateMvMatrix();
 
-	glPointSize(10.0);
-
-	// drawFrame();
-
-	myEngine.setFlatColor(0.31, 0.459, 0.267);
-	const int N = 10;
-	const float CASE_SIZE = 10.0f;
-
-	for (int i = 0; i < N; i++)
-	{
-		for (int j = 0; j < N; j++)
-		{
-			myEngine.mvMatrixStack.pushMatrix();
-			// decalage des cases
-			myEngine.mvMatrixStack.addTranslation({(i - N / 2) * CASE_SIZE,
-												   (j - N / 2) * CASE_SIZE,
-												   0.0f});
-			myEngine.updateMvMatrix();
-
-			// cases qui alternent entre deux verts
-			if ((i + j) % 2 == 0)
-			{
-				myEngine.setFlatColor(0.31f, 0.459f, 0.267f); // vert clair
-			}
-			else
-			{
-				myEngine.setFlatColor(0.267, 0.412, 0.227); // vert foncé
-			}
-			ground.drawShape();
-
-			myEngine.mvMatrixStack.popMatrix();
-			myEngine.updateMvMatrix();
-		}
-	}
+	drawGround();
 
 	myEngine.mvMatrixStack.addTranslation({0,0, 1});
 	myEngine.updateMvMatrix();
