@@ -25,7 +25,6 @@ void loadCircuit(const std::string &filename)
 
 	// Remplir la structure
 	circuit.size_grid = j["size_grid"];
-	circuit.origin = {j["origin"][0], j["origin"][1]};
 
 	circuit.path.clear();
 	for (auto &point : j["path"])
@@ -37,7 +36,12 @@ void loadCircuit(const std::string &filename)
 void initScene()
 {
 	loadCircuit("../TD_the_train/circuit.json");
-	std::vector<float> points{0.0, 0.0, 0.0};
+	std::cout << "size_grid: " << circuit.size_grid << std::endl;
+	std::cout << "path: " << std::endl;
+	for (auto &point : circuit.path)
+	{
+		std::cout << "  " << point.first << ", " << point.second << std::endl;
+	}
 
 	initGround();
 	initRail();
@@ -53,8 +57,8 @@ void drawScene()
 	// Création de la matrice lookAt avec STP3D::Matrix4D
 	STP3D::Matrix4D viewMatrix = STP3D::Matrix4D::lookAt(
 		STP3D::Vector3D(cam_x, cam_y, cam_z), // position caméra
-		STP3D::Vector3D(0.f, 0.f, 0.f), // point regardé
-		STP3D::Vector3D(0.f, 0.f, 1.f) // vecteur haut (Z vers le haut)
+		STP3D::Vector3D(0.f, 0.f, 0.f),		  // point regardé
+		STP3D::Vector3D(0.f, 0.f, 1.f)		  // vecteur haut (Z vers le haut)
 	);
 
 	// Appliquer la matrice de vue au moteur
@@ -63,23 +67,5 @@ void drawScene()
 
 	drawGround();
 
-	myEngine.mvMatrixStack.addTranslation({0,0, 1});
-	myEngine.updateMvMatrix();
-	drawRailDroit();
-	myEngine.mvMatrixStack.addTranslation({10,0, 0});
-	myEngine.updateMvMatrix();
-	drawRailCourbe();
-
-	// for (auto &[cx, cy] : circuit.path)
-	// {
-	// 	myEngine.mvMatrixStack.pushMatrix();
-	// 	myEngine.mvMatrixStack.addTranslation({cx * CASE_SIZE, // pas de centrage ici, les coords JSON sont directes
-	// 										   cy * CASE_SIZE,
-	// 										   0.01f});
-	// 	myEngine.updateMvMatrix();
-	// 	myEngine.setFlatColor(1.f, 0.f, 0.f);
-	// 	ground.drawShape();
-	// 	myEngine.mvMatrixStack.popMatrix();
-	// 	myEngine.updateMvMatrix();
-	// }
+	drawRails();
 }

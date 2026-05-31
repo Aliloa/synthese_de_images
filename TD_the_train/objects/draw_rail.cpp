@@ -138,3 +138,79 @@ void drawRailCourbe()
     drawRailCourbeInt(POS_X_RAIL2);
     drawBallastsRailCourbe();
 }
+
+void drawRails(){
+    int n = circuit.path.size();
+	for (int i = 0; i < n; i++)
+	{
+		myEngine.mvMatrixStack.pushMatrix();
+
+		float posX = circuit.path[i].first * circuit.size_grid;	 // coordonnée en X
+		float posY = circuit.path[i].second * circuit.size_grid; // coordonnée en Y
+
+		myEngine.mvMatrixStack.addTranslation({posX, posY, 1}); // position du rail
+
+		// vérifier si la dirrection a changé
+		// Direction entrante (d'où on vient)
+		int dirX_A = 0;
+		int dirY_A = 0;
+		int prevI = (i - 1 + n) % n;
+		dirX_A = circuit.path[i].first - circuit.path[prevI].first;
+		dirY_A = circuit.path[i].second - circuit.path[prevI].second;
+
+		// Direction sortante (où on va)
+		int dirX_B = 0;
+		int dirY_B = 0;
+		int nextI = (i + 1) % n;
+		dirX_B = circuit.path[nextI].first - circuit.path[i].first;
+		dirY_B = circuit.path[nextI].second - circuit.path[i].second;
+
+		//normaliser quand il y a des gaps
+		if (dirX_A > 1)  dirX_A =  1;
+		if (dirX_A < -1) dirX_A = -1;
+		if (dirY_A > 1)  dirY_A =  1;
+		if (dirY_A < -1) dirY_A = -1;
+		if (dirX_B > 1)  dirX_B =  1;
+		if (dirX_B < -1) dirX_B = -1;
+		if (dirY_B > 1)  dirY_B =  1;
+		if (dirY_B < -1) dirY_B = -1;
+
+		// si même direction rail droit, sinon rail courbé
+		if (dirX_A == dirX_B && dirY_A == dirY_B)
+		{
+			if (dirX_A == 0) // si ca avance pas sur X
+			{
+				myEngine.mvMatrixStack.addRotation(M_PI / 2, {0, 0, 1});		   // tourner à 90 degrés
+				myEngine.mvMatrixStack.addTranslation({0, -circuit.size_grid, 0}); // pour recentrer le rail
+			}
+			myEngine.updateMvMatrix();
+			drawRailDroit();
+		}
+		else
+		{
+			// COURBE
+			if (dirX_A == -1 && dirY_B == -1)
+			{
+				myEngine.mvMatrixStack.addRotation(M_PI / 2, {0, 0, 1});
+				myEngine.mvMatrixStack.addTranslation({0, -circuit.size_grid, 0}); // pour recentrer le rail
+			}
+			else if (dirY_A == -1 && dirX_B ==  1) {
+				myEngine.mvMatrixStack.addRotation(M_PI, {0, 0, 1});
+				myEngine.mvMatrixStack.addTranslation({-circuit.size_grid, -circuit.size_grid, 0}); // pour recentrer le rail
+			       } 
+			else if (dirX_A ==  1 && dirY_B ==  1) {
+				myEngine.mvMatrixStack.addRotation(3 * M_PI / 2, {0, 0, 1});
+				myEngine.mvMatrixStack.addTranslation({-circuit.size_grid, 0, 0}); // pour recentrer le rail
+			}
+			else if (dirY_A == -1 && dirX_B == -1) {
+				myEngine.mvMatrixStack.addRotation(3 * M_PI / 2, {0, 0, 1});
+				myEngine.mvMatrixStack.addTranslation({-circuit.size_grid, 0, 0});
+			}
+			myEngine.updateMvMatrix();
+			drawRailCourbe();
+		}
+
+		myEngine.mvMatrixStack.popMatrix();
+		myEngine.updateMvMatrix();
+	}
+}
