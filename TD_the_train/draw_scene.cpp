@@ -1,6 +1,7 @@
 #include "draw_scene.hpp"
 #include "objects/draw_rail.hpp"
 #include "objects/draw_ground.hpp"
+#include "objects/draw_objects.hpp"
 #include <fstream>	// pour std::ifstream
 #include <iostream> // pour les erreurs éventuelles
 
@@ -45,6 +46,7 @@ void initScene()
 
 	initGround();
 	initRail();
+	initObjects();
 }
 
 void drawScene()
@@ -68,4 +70,6 @@ void drawScene()
 	drawGround();
 
 	drawRails();
+
+	drawRandomSapins();
 }
