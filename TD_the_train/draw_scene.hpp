@@ -11,9 +11,11 @@ using namespace glbasimac;
 /* Camera parameters and functions */
 static const float Z_NEAR {0.1f};
 static const float Z_FAR {500.f};
-extern float angle_theta;      // Angle between x axis and viewpoint
-extern float angle_phy  ;      // Angle between z axis and viewpoint
-extern float dist_zoom  ;      // Distance between origin and viewpoint
+
+extern float cam_x;// Position X de la caméra
+extern float cam_y;// Position Y (hauteur)
+extern float cam_z;// Position Z de la caméra
+extern float cam_angle;// Angle de rotation
 
 //circut du json
 struct Circuit {
@@ -24,6 +26,6 @@ struct Circuit {
 /* OpenGL Engine */
 extern GLBI_Engine myEngine;
 
-void initScene();
+void initScene(const std::string& jsonFile);
 
 void drawScene();

@@ -18,3 +18,6 @@ float angle = angleStart + i * angleStep;
 //avec le cercle trigo on fait cos de la'angle pour avoir les valuers 2pi/2 1/2 3pi/2 etc et on multiplie par le rayon
 		float posY = (POS_X_RAIL1 - 0.6) * cos(angle); // position en x d'après le cercle trigo
 		float posX = (POS_X_RAIL1 - 0.6) * sin(angle);
+
+Pour lancer le programme : (depuis le dossier bin)
+./TD_the_train_ex01.exe ../TD_the_train/circuit.json

@@ -6,9 +6,10 @@
 #include <iostream> // pour les erreurs éventuelles
 
 /// Camera parameters
-float angle_theta{90.0}; // Angle between x axis and viewpoint
-float angle_phy{30.0};	 // Angle between z axis and viewpoint
-float dist_zoom{30.0};	 // Distance between origin and viewpoint
+float cam_x = 0.f;
+float cam_y = 5.f;
+float cam_z = 5.f;
+float cam_angle = 0.f;
 
 GLBI_Engine myEngine;
 Circuit circuit;
@@ -34,9 +35,10 @@ void loadCircuit(const std::string &filename)
 	}
 }
 
-void initScene()
+void initScene(const std::string& jsonFile)
 {
-	loadCircuit("../TD_the_train/circuit.json");
+	loadCircuit(jsonFile); //le chemin du fichier est passé par l'utilisateur
+	// loadCircuit("../TD_the_train/circuit.json");
 	std::cout << "size_grid: " << circuit.size_grid << std::endl;
 	std::cout << "path: " << std::endl;
 	for (auto &point : circuit.path)
@@ -51,17 +53,17 @@ void initScene()
 
 void drawScene()
 {
-	// Positionnement caméra en coordonnées sphériques
-	float cam_x = dist_zoom * cos(angle_phy * M_PI / 180.f) * cos(angle_theta * M_PI / 180.f);
-	float cam_y = dist_zoom * cos(angle_phy * M_PI / 180.f) * sin(angle_theta * M_PI / 180.f);
-	float cam_z = dist_zoom * sin(angle_phy * M_PI / 180.f);
-
-	// Création de la matrice lookAt avec STP3D::Matrix4D
+	// calcul de la position de la camera
+	float rad = cam_angle * M_PI / 180.f; // coinvertir l'angle en radians
+	float dir_x = cosf(rad);
+	float dir_y = sinf(rad);
+	
+	// matrice lookAt
 	STP3D::Matrix4D viewMatrix = STP3D::Matrix4D::lookAt(
-		STP3D::Vector3D(cam_x, cam_y, cam_z), // position caméra
-		STP3D::Vector3D(0.f, 0.f, 0.f),		  // point regardé
-		STP3D::Vector3D(0.f, 0.f, 1.f)		  // vecteur haut (Z vers le haut)
-	);
+        STP3D::Vector3D(cam_x, cam_y, cam_z),               // position caméra
+        STP3D::Vector3D(cam_x + dir_x, cam_y + dir_y, cam_z), // point regardé (devant)
+        STP3D::Vector3D(0.f, 0.f, 1.f)                      // Z vers le haut (comme avant)
+    );
 
 	// Appliquer la matrice de vue au moteur
 	myEngine.mvMatrixStack.loadTransformation(viewMatrix);

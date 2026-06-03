@@ -42,7 +42,6 @@ void onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int /*mods
 	int is_pressed = (action == GLFW_PRESS);
 	switch (key)
 	{
-	case GLFW_KEY_A:
 	case GLFW_KEY_ESCAPE:
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 		break;
@@ -53,18 +52,9 @@ void onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int /*mods
 	case GLFW_KEY_P:
 		if (is_pressed)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		// TO DO EX01 part 3
 
-	case GLFW_KEY_R:
-		//> EXO 3
-		//< FIN EXO 3
-		break;
-	case GLFW_KEY_T:
-		//> EXO 3
-		//< FIN EXO 3
-		break;
 	default:
-		std::cerr << "Touche non gérée " << key << std::endl;
+		break;
 	}
 }
 
@@ -88,33 +78,54 @@ void onMouseButton(GLFWwindow *window, int button, int action, int /*mods*/)
 // Nouveau callback à ajouter
 void onMouseMove(GLFWwindow * /*window*/, double xpos, double ypos)
 {
-	if (!mousePressed)
+	static bool firstMouse = true;
+	if (firstMouse)
+	{
+		lastMouseX = xpos;
+		lastMouseY = ypos;
+		firstMouse = false;
 		return;
+	}
 
 	double dx = xpos - lastMouseX;
-	double dy = ypos - lastMouseY;
-
-	angle_theta += dx * 0.3f; // sensibilité horizontale
-	angle_phy -= dy * 0.3f;	  // sensibilité verticale
-
-	// Bloquer pour éviter le gimbal lock
-	if (angle_phy > 89.0f)
-		angle_phy = 89.0f;
-	if (angle_phy < 1.0f)
-		angle_phy = 1.0f;
-
 	lastMouseX = xpos;
 	lastMouseY = ypos;
+
+	cam_angle -= (float)dx * 0.2f; //- sinon c'est inversé
 }
+
+void processMovement(GLFWwindow* window, float dt)
+{
+    float speed = 10.f * dt;
+    float rad   = cam_angle * M_PI / 180.f;
+    float fx = cosf(rad); // forward X
+    float fy = sinf(rad); // forward Y
+    float sx = -fy; // strafe X (perpendiculaire)
+    float sy =  fx; // strafe Y
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) { cam_x += fx*speed; cam_y += fy*speed; } // Z azerty
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) { cam_x -= fx*speed; cam_y -= fy*speed; } // S azerty
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) { cam_x += sx*speed; cam_y += sy*speed; } // Q azerty
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { cam_x -= sx*speed; cam_y -= sy*speed; } // D azerty
+}
+
 // Ajouter aussi le scroll pour le zoom
-void onScroll(GLFWwindow * /*window*/, double /*xoffset*/, double yoffset)
+// void onScroll(GLFWwindow * /*window*/, double /*xoffset*/, double yoffset)
+// {
+// 	dist_zoom -= yoffset * 1.5f;
+// 	if (dist_zoom < 1.0f)
+// 		dist_zoom = 1.0f;
+// }
+int main(int argc, char ** argv)
 {
-	dist_zoom -= yoffset * 1.5f;
-	if (dist_zoom < 1.0f)
-		dist_zoom = 1.0f;
-}
-int main(int /*argc*/, char ** /*argv*/)
-{
+	//initialisation de l'argument le nom du fichier JSON à charger
+	 if (argc < 2) {
+        std::cerr << "erreur : donnez un fichier JSON" << std::endl;
+        std::cerr << "usage : " << argv[0] << " scene.json" << std::endl;
+        return -1;
+    }
+
+    std::string jsonFile = argv[1];
 	/* GLFW initialisation */
 	GLFWwindow *window;
 	if (!glfwInit())
@@ -153,7 +164,7 @@ int main(int /*argc*/, char ** /*argv*/)
 	glfwSetMouseButtonCallback(window, onMouseButton);
 
 	glfwSetCursorPosCallback(window, onMouseMove);
-	glfwSetScrollCallback(window, onScroll);
+	// glfwSetScrollCallback(window, onScroll);
 
 	std::cout << "Engine init" << std::endl;
 	// TO DO EX01 part 2
@@ -163,7 +174,8 @@ int main(int /*argc*/, char ** /*argv*/)
 	onWindowResized(window, WINDOW_WIDTH, WINDOW_HEIGHT);
 	CHECK_GL;
 
-	initScene();
+	initScene(jsonFile);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //pour ne plus voir le curseur dc la souris
 	glEnable(GL_DEPTH_TEST);
 	double elapsedTime{0.0};
 
@@ -172,6 +184,8 @@ int main(int /*argc*/, char ** /*argv*/)
 	{
 		/* Get time (in second) at loop beginning */
 		double startTime = glfwGetTime();
+
+		processMovement(window, (float)elapsedTime);
 
 		/* Render begins here */
 		glClearColor(0.5f, 0.7f, 0.9f, 1.0f);
