@@ -3,6 +3,7 @@
 #include "objects/draw_ground.hpp"
 #include "objects/draw_objects.hpp"
 #include "objects/draw_station.hpp"
+#include "objects/draw_train.hpp"
 #include <fstream>
 #include <iostream>
 
@@ -45,6 +46,7 @@ void initScene(const std::string &jsonFile)
 	initRail();
 	initStation();
 	initObjects();
+	initTrain();
 }
 
 void drawScene()
@@ -65,4 +67,5 @@ void drawScene()
 	drawRails();
 	drawStation();
 	drawRandomSapins();
+	drawTrain();
 }
