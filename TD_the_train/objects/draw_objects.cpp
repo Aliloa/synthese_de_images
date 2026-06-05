@@ -28,7 +28,7 @@ void initObjects()
 
 void drawSapin()
 {
-    // ----------------Tronc
+    // Tronc
     myEngine.setFlatColor(0.349f, 0.294f, 0.247f);
     myEngine.mvMatrixStack.pushMatrix();
     myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1});

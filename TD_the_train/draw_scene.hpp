@@ -9,23 +9,26 @@
 using namespace glbasimac;
 
 /* Camera parameters and functions */
-static const float Z_NEAR {0.1f};
-static const float Z_FAR {500.f};
+static const float Z_NEAR{0.1f};
+static const float Z_FAR{500.f};
 
-extern float cam_x;// Position X de la caméra
-extern float cam_y;// Position Y (hauteur)
-extern float cam_z;// Position Z de la caméra
-extern float cam_angle;// Angle de rotation
+extern float cam_x;
+extern float cam_y;
+extern float cam_z;
+extern float cam_angle;
 
-//circut du json
-struct Circuit {
+struct Circuit
+{
     int size_grid;
-    std::vector<std::pair<int,int>> path;
+    std::vector<std::pair<int, int>> path;
+    std::pair<int, int> station;
+    int train_pos;
 };
 
 /* OpenGL Engine */
 extern GLBI_Engine myEngine;
+extern Circuit circuit;
 
-void initScene(const std::string& jsonFile);
+void initScene(const std::string &jsonFile);
 
 void drawScene();
