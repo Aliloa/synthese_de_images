@@ -30,7 +30,7 @@ void drawLocomotive()
   corps->draw();
   myEngine.mvMatrixStack.popMatrix();
 
-  // Cabine
+  // carré au dessus locomotive
   myEngine.mvMatrixStack.pushMatrix();
   myEngine.setFlatColor(0.6f, 0.05f, 0.05f);
   myEngine.mvMatrixStack.addTranslation({-1.5f, 0.f, 3.5f});
