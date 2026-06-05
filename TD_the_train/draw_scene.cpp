@@ -74,4 +74,6 @@ void drawScene()
 	drawRails();
 
 	drawRandomSapins();
+
+	drawKyle();
 }

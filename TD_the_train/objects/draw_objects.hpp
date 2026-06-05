@@ -14,3 +14,4 @@ extern GLBI_Engine myEngine;
 void initObjects();
 void drawSapin();
 void drawRandomSapins();
+void drawKyle();

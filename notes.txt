@@ -21,3 +21,9 @@ float angle = angleStart + i * angleStep;
 
 Pour lancer le programme : (depuis le dossier bin)
 ./TD_the_train_ex01.exe ../TD_the_train/circuit.json
+
+Pour rebuild : (depuis le dossier build)
+cmake --build .
+
+Tout en 1 ligne:
+cd ../build ; cmake --build . ; cd ../bin ; ./TD_the_train_ex01.exe ../TD_the_train/circuit.json
