@@ -177,7 +177,7 @@ void drawRails()
         float posX = circuit.path[i].first * circuit.size_grid;  // coordonnée en X
         float posY = circuit.path[i].second * circuit.size_grid; // coordonnée en Y
 
-        myEngine.mvMatrixStack.addTranslation({posX, posY, 1}); // position du rail
+        myEngine.mvMatrixStack.addTranslation({posX, posY, 0.9}); // position du rail
 
         // vérifier si la dirrection a changé
         // Direction entrante (d'où on vient)

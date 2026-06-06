@@ -35,7 +35,7 @@ void initObjects()
     // textures
     textureFeuillage.createTexture();
 
-    //feuilles du sapin
+    // feuilles du sapin
     int w, h, n;
     stbi_set_flip_vertically_on_load(true);
     unsigned char *pixels = stbi_load("../assets/textures/sapin.jpg", &w, &h, &n, 0);
@@ -48,7 +48,7 @@ void initObjects()
     textureFeuillage.detachTexture();
     stbi_image_free(pixels);
 
-    //bois
+    // bois
     textureTronc.createTexture();
     int w1, h1, n1;
     unsigned char *pixelsBois = stbi_load("../assets/textures/bois.jpg", &w1, &h1, &n1, 0);
@@ -122,8 +122,44 @@ void drawRandomSapins()
     }
 }
 
-// KYLE
-void drawKyle()
+// CORP GENERAL
+struct Color
+{
+    float r, g, b;
+};
+
+// bras animé gauche
+void drawArm(Color body_color, Color hands_color)
+{
+    myEngine.setFlatColor(body_color.r, body_color.g, body_color.b);
+    myEngine.mvMatrixStack.pushMatrix();
+    // myEngine.mvMatrixStack.addTranslation({2, 0, 2});
+    myEngine.mvMatrixStack.addRotation(M_PI, {1, 1, 0});
+    myEngine.mvMatrixStack.addHomothety({0.2, 1, 0.2});
+    myEngine.updateMvMatrix();
+    bodyCylinder->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    myEngine.setFlatColor(hands_color.r, hands_color.g, hands_color.b);
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.mvMatrixStack.addTranslation({1, 0, 0});
+    myEngine.mvMatrixStack.addHomothety({0.4, 0.4, 0.4});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+}
+
+void drawAnimatedArm(Color body_color, Color hands_color, float handAnimation)
+{
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.mvMatrixStack.addTranslation({0.9, 0, 2});
+    myEngine.mvMatrixStack.addRotation(handAnimation, {0, 1, 0});
+    drawArm({body_color}, // corps
+            {hands_color});
+    myEngine.mvMatrixStack.popMatrix();
+}
+
+void drawBody(Color body_color, Color collar_color, Color legs_color, Color hands_color)
 {
     // Tete
     myEngine.mvMatrixStack.pushMatrix();
@@ -180,7 +216,7 @@ void drawKyle()
 
     // corps
     myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(1.f, 0.549f, 0.125f);
+    myEngine.setFlatColor(body_color.r, body_color.g, body_color.b);
     myEngine.mvMatrixStack.addTranslation({0, 0, 1.8});
     myEngine.mvMatrixStack.addHomothety({1.1, 1.1, 1});
     myEngine.updateMvMatrix();
@@ -196,7 +232,7 @@ void drawKyle()
 
     // col
     myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.153f, 0.612f, 0.208f);
+    myEngine.setFlatColor(collar_color.r, collar_color.g, collar_color.b);
     myEngine.mvMatrixStack.addTranslation({0, 0, 2.5});
     myEngine.mvMatrixStack.addHomothety({0.9, 0.9, 0.2});
     myEngine.updateMvMatrix();
@@ -205,7 +241,7 @@ void drawKyle()
 
     // jambes
     float posX_jambe = -0.5f;
-    myEngine.setFlatColor(0.133f, 0.329f, 0.188f);
+    myEngine.setFlatColor(legs_color.r, legs_color.g, legs_color.b);
     for (int i = 0; i < 2; i++)
     {
         myEngine.mvMatrixStack.pushMatrix();
@@ -232,35 +268,35 @@ void drawKyle()
         posX_pied += 1;
     }
 
-    // bras
-    float posX_bras = -2.0f;
-    myEngine.setFlatColor(1.f, 0.549f, 0.125f);
-    for (int i = 0; i < 2; i++)
-    {
-        myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation({posX_bras, 0, 2});
-        myEngine.mvMatrixStack.addRotation(M_PI, {1, 1, 0});
-        myEngine.mvMatrixStack.addHomothety({0.2, 1, 0.2});
-        myEngine.updateMvMatrix();
-        bodyCylinder->draw();
-        myEngine.mvMatrixStack.popMatrix();
-        posX_bras += 3;
-    }
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.mvMatrixStack.addTranslation({-0.9, 0, 2});
+    myEngine.mvMatrixStack.addRotation(M_PI-0.7, {0, 1, 0});
+    drawArm(body_color, hands_color);
+    myEngine.mvMatrixStack.popMatrix();
 
-    // mains
-    float posX_main = -2.0f;
-    myEngine.setFlatColor(0.145f, 0.741f, 0.216f);
-    for (int i = 0; i < 2; i++)
-    {
-        myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation({posX_main, 0, 2});
-        myEngine.mvMatrixStack.addHomothety({0.4, 0.4, 0.4});
-        myEngine.updateMvMatrix();
-        sphere->draw();
-        myEngine.mvMatrixStack.popMatrix();
-        posX_main += 4;
-    }
+    // bras gauche
+    // myEngine.setFlatColor(body_color.r, body_color.g, body_color.b);
+    // myEngine.mvMatrixStack.pushMatrix();
+    // myEngine.mvMatrixStack.addTranslation({-2, 0, 2});
+    // myEngine.mvMatrixStack.addRotation(M_PI, {1, 1, 0});
+    // myEngine.mvMatrixStack.addHomothety({0.2, 1, 0.2});
+    // myEngine.updateMvMatrix();
+    // bodyCylinder->draw();
+    // myEngine.mvMatrixStack.popMatrix();
 
+    // // mains
+    // myEngine.setFlatColor(hands_color.r, hands_color.g, hands_color.b);
+    // myEngine.mvMatrixStack.pushMatrix();
+    // myEngine.mvMatrixStack.addTranslation({-2, 0, 2});
+    // myEngine.mvMatrixStack.addHomothety({0.4, 0.4, 0.4});
+    // myEngine.updateMvMatrix();
+    // sphere->draw();
+    // myEngine.mvMatrixStack.popMatrix();
+}
+
+// HATS
+void drawKyleHat()
+{
     // chapeau
     // derriere
     myEngine.mvMatrixStack.pushMatrix();
@@ -296,157 +332,34 @@ void drawKyle()
     }
 }
 
-// STAN
-void drawStan()
+// KYLE
+void drawKyle(float handAnimation)
 {
-    // Tete
-    myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.988f, 0.87f, 0.761f);
-    myEngine.mvMatrixStack.addTranslation({0, 0, 3.5});
-    myEngine.mvMatrixStack.addHomothety({1.1, 1.1, 1.1});
-    myEngine.updateMvMatrix();
-    sphere->draw();
-    myEngine.mvMatrixStack.popMatrix();
+    drawBody({1.f, 0.549f, 0.125f},     // corps
+             {0.153f, 0.612f, 0.208f},  // collar
+             {0.133f, 0.329f, 0.188f},  // jambes
+             {0.145f, 0.741f, 0.216f}); // mains
+    drawKyleHat();
+    drawAnimatedArm({1.f, 0.549f, 0.125f}, // corps
+                    {0.145f, 0.741f, 0.216f}, handAnimation);
+}
 
-    // yeux
-    myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(1.f, 1.f, 1.f);
-    myEngine.mvMatrixStack.addTranslation({0.2, 1.05, 3.68});
-    myEngine.mvMatrixStack.addRotation(-0.5, {0, 1, 0});
-    myEngine.mvMatrixStack.addHomothety({0.28, 0.15, 0.35});
-    myEngine.updateMvMatrix();
-    sphere->draw();
-    myEngine.mvMatrixStack.popMatrix();
+// STAN
 
-    myEngine.mvMatrixStack.pushMatrix();
-    myEngine.mvMatrixStack.addTranslation({-0.2, 1.05, 3.68});
-    myEngine.mvMatrixStack.addRotation(0.5, {0, 1, 0});
-    myEngine.mvMatrixStack.addHomothety({0.28, 0.15, 0.35});
-    myEngine.updateMvMatrix();
-    sphere->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // pupilles
-    myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.f, 0.f, 0.f);
-    myEngine.mvMatrixStack.addTranslation({0.2, 1.15, 3.68});
-    myEngine.mvMatrixStack.addHomothety({0.07, 0.07, 0.07});
-    myEngine.updateMvMatrix();
-    sphere->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    myEngine.mvMatrixStack.pushMatrix();
-    myEngine.mvMatrixStack.addTranslation({-0.2, 1.15, 3.68});
-    myEngine.mvMatrixStack.addHomothety({0.07, 0.07, 0.07});
-    myEngine.updateMvMatrix();
-    sphere->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // bouche
-    myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.f, 0.f, 0.f);
-    myEngine.mvMatrixStack.addTranslation({-0.2, 1.05, 3.});
-    myEngine.mvMatrixStack.addRotation(M_PI, {1, 1, 0});
-    myEngine.mvMatrixStack.addHomothety({0.02, 0.5, 0.02});
-    myEngine.updateMvMatrix();
-    bodyCylinder->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // corps
-    myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.616f, 0.369f, 0.314f);
-    myEngine.mvMatrixStack.addTranslation({0, 0, 1.8});
-    myEngine.mvMatrixStack.addHomothety({1.1, 1.1, 1});
-    myEngine.updateMvMatrix();
-    sphere->draw();
-    myEngine.mvMatrixStack.popMatrix();
-    myEngine.mvMatrixStack.pushMatrix();
-    myEngine.mvMatrixStack.addTranslation({0, 0, 0.8});
-    myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1}); // redresser le cylindre
-    myEngine.mvMatrixStack.addHomothety({1.1, 1.1, 1});
-    myEngine.updateMvMatrix();
-    bodyCylinder->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // col
-    myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.851f, 0.141f, 0.255f);
-    myEngine.mvMatrixStack.addTranslation({0, 0, 2.5});
-    myEngine.mvMatrixStack.addHomothety({0.9, 0.9, 0.2});
-    myEngine.updateMvMatrix();
-    sphere->draw();
-    myEngine.mvMatrixStack.popMatrix();
-
-    // jambes
-    float posX_jambe = -0.5f;
-    myEngine.setFlatColor(0.31f, 0.365f, 0.627f);
-    for (int i = 0; i < 2; i++)
-    {
-        myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation({posX_jambe, 0, 0.2});
-        myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1});
-        myEngine.mvMatrixStack.addHomothety({0.5, 0.65, 0.9});
-        myEngine.updateMvMatrix();
-        bodyCylinder->draw();
-        myEngine.mvMatrixStack.popMatrix();
-        posX_jambe += 1;
-    }
-
-    // pieds
-    float posX_pied = -0.5f;
-    myEngine.setFlatColor(0.05f, 0.05f, 0.05f);
-    for (int i = 0; i < 2; i++)
-    {
-        myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation({posX_pied, 0.4, 0.1});
-        myEngine.mvMatrixStack.addHomothety({0.9, 2, 0.2});
-        myEngine.updateMvMatrix();
-        bodyCube->draw();
-        myEngine.mvMatrixStack.popMatrix();
-        posX_pied += 1;
-    }
-
-    // bras
-    float posX_bras = -2.0f;
-    myEngine.setFlatColor(0.616f, 0.369f, 0.314f);
-    for (int i = 0; i < 2; i++)
-    {
-        myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation({posX_bras, 0, 2});
-        myEngine.mvMatrixStack.addRotation(M_PI, {1, 1, 0});
-        myEngine.mvMatrixStack.addHomothety({0.2, 1, 0.2});
-        myEngine.updateMvMatrix();
-        bodyCylinder->draw();
-        myEngine.mvMatrixStack.popMatrix();
-        posX_bras += 3;
-    }
-
-    // mains
-    float posX_main = -2.0f;
-    myEngine.setFlatColor(0.851f, 0.141f, 0.255f);
-    for (int i = 0; i < 2; i++)
-    {
-        myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation({posX_main, 0, 2});
-        myEngine.mvMatrixStack.addHomothety({0.4, 0.4, 0.4});
-        myEngine.updateMvMatrix();
-        sphere->draw();
-        myEngine.mvMatrixStack.popMatrix();
-        posX_main += 4;
-    }
-
+void drawHat(Color full_color, Color pompom_color)
+{
     // bonnet
     myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.31f, 0.365f, 0.627f);
+    myEngine.setFlatColor(full_color.r, full_color.g, full_color.b);
     myEngine.mvMatrixStack.addTranslation({0, 0, 4.4});
     myEngine.mvMatrixStack.addHomothety({1.15, 1.15, 0.8});
     myEngine.updateMvMatrix();
     sphere->draw();
     myEngine.mvMatrixStack.popMatrix();
 
-     // bas
+    // bas
     myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.851f, 0.141f, 0.255f);
+    myEngine.setFlatColor(pompom_color.r, pompom_color.g, pompom_color.b);
     myEngine.mvMatrixStack.addTranslation({0, 0, 4});
     myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1});
     myEngine.mvMatrixStack.addHomothety({1.15, 0.3, 1.15});
@@ -454,12 +367,36 @@ void drawStan()
     bodyCylinder->draw();
     myEngine.mvMatrixStack.popMatrix();
 
-    //pompom
+    // pompom
     myEngine.mvMatrixStack.pushMatrix();
     myEngine.mvMatrixStack.addTranslation({0, 0, 5.4});
     myEngine.mvMatrixStack.addHomothety({0.4, 0.4, 0.4});
     myEngine.updateMvMatrix();
     sphere->draw();
     myEngine.mvMatrixStack.popMatrix();
+}
 
+void drawStan(float handAnimation)
+{
+    drawBody({0.616f, 0.369f, 0.314f},  // corps
+             {0.851f, 0.141f, 0.255f},  // collar
+             {0.31f, 0.365f, 0.627f},   // jambes
+             {0.851f, 0.141f, 0.255f}); // mains
+    drawHat({0.31f, 0.365f, 0.627f},    // chapeau
+            {0.851f, 0.141f, 0.255f});
+            drawAnimatedArm({0.616f, 0.369f, 0.314f}, // corps
+                    {0.851f, 0.141f, 0.255f}, //main
+                    handAnimation);
+}
+
+// CARTMAN
+void drawCartman()
+{
+    myEngine.mvMatrixStack.addHomothety({1.5, 1.2, 1});
+    drawBody({0.843f, 0.129f, 0.255f}, // corps
+             {0.843f, 0.129f, 0.255f}, // collar
+             {0.486f, 0.298f, 0.231f}, // jambes
+             {0.98f, 0.882f, 0.016f}); // mains
+    drawHat({0.275f, 0.698f, 0.725f},  // chapeau
+            {0.976f, 0.867f, 0.004f});
 }

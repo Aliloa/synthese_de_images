@@ -14,5 +14,6 @@ extern GLBI_Engine myEngine;
 void initObjects();
 void drawSapin();
 void drawRandomSapins();
-void drawKyle();
-void drawStan();
+void drawKyle(float handAnimation);
+void drawStan(float handAnimation);
+void drawCartman();

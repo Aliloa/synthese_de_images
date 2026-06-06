@@ -6,6 +6,7 @@
 #include "objects/draw_train.hpp"
 #include <fstream>
 #include <iostream>
+#include <cmath>
 #define STB_IMAGE_IMPLEMENTATION
 
 float cam_x = 0.f;
@@ -50,6 +51,10 @@ void initScene(const std::string &jsonFile)
 	initTrain();
 }
 
+float animate = 0.0f;
+float armAnimationSlow = 0.0f;
+float armAnimationFast = 0.0f;
+
 void drawScene()
 {
 	float rad = cam_angle * M_PI / 180.f;
@@ -57,9 +62,9 @@ void drawScene()
 	float dir_y = sinf(rad);
 
 	STP3D::Matrix4D viewMatrix = STP3D::Matrix4D::lookAt(
-			STP3D::Vector3D(cam_x, cam_y, cam_z),
-			STP3D::Vector3D(cam_x + dir_x, cam_y + dir_y, cam_z),
-			STP3D::Vector3D(0.f, 0.f, 1.f));
+		STP3D::Vector3D(cam_x, cam_y, cam_z),
+		STP3D::Vector3D(cam_x + dir_x, cam_y + dir_y, cam_z),
+		STP3D::Vector3D(0.f, 0.f, 1.f));
 
 	myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 	myEngine.updateMvMatrix();
@@ -69,11 +74,16 @@ void drawScene()
 	drawStation();
 	drawRandomSapins();
 
+	animate += 0.02f;
+	armAnimationSlow = sin(animate*3) * 0.8f; // pour que ca fasse des allé retour entre 0.8 et -0.8
+	armAnimationFast = sin(animate*10) * 0.8f;	// pour que ca fasse des allé retour + rapide
 
-	drawKyle();
+	drawKyle(armAnimationSlow);
 	myEngine.mvMatrixStack.pushMatrix();
 	myEngine.mvMatrixStack.addTranslation({8, 0, 0});
-	drawStan();
+	drawStan(armAnimationFast);
+	// myEngine.mvMatrixStack.addTranslation({8, 0, 0});
+	// drawCartman();
 	myEngine.mvMatrixStack.popMatrix();
 	drawTrain();
 }
