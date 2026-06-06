@@ -6,6 +6,7 @@
 #include "objects/draw_train.hpp"
 #include <fstream>
 #include <iostream>
+#define STB_IMAGE_IMPLEMENTATION
 
 float cam_x = 0.f;
 float cam_y = 5.f;
@@ -68,6 +69,11 @@ void drawScene()
 	drawStation();
 	drawRandomSapins();
 
+
 	drawKyle();
+	myEngine.mvMatrixStack.pushMatrix();
+	myEngine.mvMatrixStack.addTranslation({8, 0, 0});
+	drawStan();
+	myEngine.mvMatrixStack.popMatrix();
 	drawTrain();
 }

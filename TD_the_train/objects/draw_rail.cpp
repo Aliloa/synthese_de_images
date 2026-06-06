@@ -1,10 +1,15 @@
 #include "draw_rail.hpp"
 #include <fstream>  // pour std::ifstream
 #include <iostream> // pour les erreurs éventuelles
+#include "glbasimac/glbi_texture.hpp"
+#include "tools/stb_image.h"
 
 IndexedMesh *cylinder;
 IndexedMesh *cube;
 GLBI_Convex_2D_Shape rail_courbe{3};
+
+glbasimac::GLBI_Texture textureBallast;
+glbasimac::GLBI_Texture textureMetal;
 
 const float POS_X_RAIL1 = 3.f; // rail1
 const float POS_X_RAIL2 = 7.f; // rail 2
@@ -19,6 +24,21 @@ void initRail()
 
     cylinder = basicCylinder(1.0f, 1.0f);
     cylinder->createVAO();
+
+    // textures
+    //ballast
+    textureBallast.createTexture();
+    int w, h, n;
+    stbi_set_flip_vertically_on_load(true); // OpenGL attend l'origine en bas
+    unsigned char *pixels = stbi_load("../assets/textures/bois.jpg", &w, &h, &n, 0);
+    textureBallast.attachTexture();
+    textureBallast.loadImage(w, h, n, pixels);
+    textureBallast.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    textureBallast.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    textureBallast.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    textureBallast.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
+    textureBallast.detachTexture();
+    stbi_image_free(pixels);
 }
 
 // RAIL DROIT
@@ -44,7 +64,9 @@ void drawRailDroit()
     myEngine.updateMvMatrix();
 
     // Ballasts
-    myEngine.setFlatColor(0.431f, 0.357f, 0.278f);
+    // myEngine.setFlatColor(0.431f, 0.357f, 0.278f);
+    myEngine.activateTexturing(true);
+    textureBallast.attachTexture();
     for (int i = 0; i < 5; i++)
     {
         float posX = sx + i * (sx * 2.f + rr * 2.f);
@@ -56,6 +78,8 @@ void drawRailDroit()
         myEngine.mvMatrixStack.popMatrix();
         myEngine.updateMvMatrix();
     }
+    textureBallast.detachTexture();
+    myEngine.activateTexturing(false);
 }
 
 // RAIL COURBE
@@ -111,7 +135,9 @@ void drawRailCourbeInt(float rayon)
 void drawBallastsRailCourbe()
 {
     // Ballasts
-    myEngine.setFlatColor(0.431f, 0.357f, 0.278f);
+    // myEngine.setFlatColor(0.431f, 0.357f, 0.278f);
+    myEngine.activateTexturing(true);
+    textureBallast.attachTexture();
     float angleStart = M_PI / 12; // permiere ballast
     float angleStep = M_PI / 7;   // ecart entre chaque ballast
     for (int i = 0; i < 3; i++)
@@ -130,6 +156,8 @@ void drawBallastsRailCourbe()
         myEngine.mvMatrixStack.popMatrix();
         myEngine.updateMvMatrix();
     }
+    textureBallast.detachTexture();
+    myEngine.activateTexturing(false);
 }
 
 void drawRailCourbe()

@@ -15,3 +15,4 @@ void initObjects();
 void drawSapin();
 void drawRandomSapins();
 void drawKyle();
+void drawStan();

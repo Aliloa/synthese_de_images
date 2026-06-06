@@ -13,6 +13,7 @@ IndexedMesh *bodyCylinder;
 
 // textures
 glbasimac::GLBI_Texture textureFeuillage;
+glbasimac::GLBI_Texture textureTronc;
 
 void initObjects()
 {
@@ -33,41 +34,50 @@ void initObjects()
 
     // textures
     textureFeuillage.createTexture();
-    // Charger l'image avec stb_image
+
+    //feuilles du sapin
     int w, h, n;
-    stbi_set_flip_vertically_on_load(true); // OpenGL attend l'origine en bas
-    unsigned char *pixels = stbi_load("../assets/textures/feuillage.png", &w, &h, &n, 0);
-    if (!pixels)
-    {
-        std::cerr << "Erreur chargement texture : " << stbi_failure_reason() << std::endl;
-    }
-    else
-    {
-        textureFeuillage.attachTexture();
-        textureFeuillage.loadImage(w, h, n, pixels);
-        textureFeuillage.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        textureFeuillage.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        textureFeuillage.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
-        textureFeuillage.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
-        textureFeuillage.detachTexture();
-        stbi_image_free(pixels);
-    }
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char *pixels = stbi_load("../assets/textures/sapin.jpg", &w, &h, &n, 0);
+    textureFeuillage.attachTexture();
+    textureFeuillage.loadImage(w, h, n, pixels);
+    textureFeuillage.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    textureFeuillage.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    textureFeuillage.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    textureFeuillage.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
+    textureFeuillage.detachTexture();
+    stbi_image_free(pixels);
+
+    //bois
+    textureTronc.createTexture();
+    int w1, h1, n1;
+    unsigned char *pixelsBois = stbi_load("../assets/textures/bois.jpg", &w1, &h1, &n1, 0);
+    textureTronc.attachTexture();
+    textureTronc.loadImage(w1, h1, n1, pixelsBois);
+    textureTronc.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    textureTronc.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    textureTronc.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    textureTronc.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
+    textureTronc.detachTexture();
+    stbi_image_free(pixelsBois);
 }
 
 void drawSapin()
 {
     // Tronc
-    myEngine.setFlatColor(0.349f, 0.294f, 0.247f);
+    // myEngine.setFlatColor(0.349f, 0.294f, 0.247f);
+    myEngine.activateTexturing(true);
+    textureTronc.attachTexture();
     myEngine.mvMatrixStack.pushMatrix();
     myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1});
     myEngine.mvMatrixStack.addHomothety({0.8, 2, 0.8});
     myEngine.updateMvMatrix();
     tronc->draw();
     myEngine.mvMatrixStack.popMatrix();
+    textureTronc.detachTexture();
 
     myEngine.mvMatrixStack.pushMatrix();
     // myEngine.setFlatColor(0.322f, 0.529f, 0.275f);
-    myEngine.activateTexturing(true);
     textureFeuillage.attachTexture();
     myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1});
     myEngine.mvMatrixStack.addTranslation({0, 2, 0});
@@ -113,7 +123,6 @@ void drawRandomSapins()
 }
 
 // KYLE
-
 void drawKyle()
 {
     // Tete
@@ -285,4 +294,172 @@ void drawKyle()
         myEngine.mvMatrixStack.popMatrix();
         posX_chapeau -= 2;
     }
+}
+
+// STAN
+void drawStan()
+{
+    // Tete
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(0.988f, 0.87f, 0.761f);
+    myEngine.mvMatrixStack.addTranslation({0, 0, 3.5});
+    myEngine.mvMatrixStack.addHomothety({1.1, 1.1, 1.1});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    // yeux
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(1.f, 1.f, 1.f);
+    myEngine.mvMatrixStack.addTranslation({0.2, 1.05, 3.68});
+    myEngine.mvMatrixStack.addRotation(-0.5, {0, 1, 0});
+    myEngine.mvMatrixStack.addHomothety({0.28, 0.15, 0.35});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.mvMatrixStack.addTranslation({-0.2, 1.05, 3.68});
+    myEngine.mvMatrixStack.addRotation(0.5, {0, 1, 0});
+    myEngine.mvMatrixStack.addHomothety({0.28, 0.15, 0.35});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    // pupilles
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(0.f, 0.f, 0.f);
+    myEngine.mvMatrixStack.addTranslation({0.2, 1.15, 3.68});
+    myEngine.mvMatrixStack.addHomothety({0.07, 0.07, 0.07});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.mvMatrixStack.addTranslation({-0.2, 1.15, 3.68});
+    myEngine.mvMatrixStack.addHomothety({0.07, 0.07, 0.07});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    // bouche
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(0.f, 0.f, 0.f);
+    myEngine.mvMatrixStack.addTranslation({-0.2, 1.05, 3.});
+    myEngine.mvMatrixStack.addRotation(M_PI, {1, 1, 0});
+    myEngine.mvMatrixStack.addHomothety({0.02, 0.5, 0.02});
+    myEngine.updateMvMatrix();
+    bodyCylinder->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    // corps
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(0.616f, 0.369f, 0.314f);
+    myEngine.mvMatrixStack.addTranslation({0, 0, 1.8});
+    myEngine.mvMatrixStack.addHomothety({1.1, 1.1, 1});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.mvMatrixStack.addTranslation({0, 0, 0.8});
+    myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1}); // redresser le cylindre
+    myEngine.mvMatrixStack.addHomothety({1.1, 1.1, 1});
+    myEngine.updateMvMatrix();
+    bodyCylinder->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    // col
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(0.851f, 0.141f, 0.255f);
+    myEngine.mvMatrixStack.addTranslation({0, 0, 2.5});
+    myEngine.mvMatrixStack.addHomothety({0.9, 0.9, 0.2});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    // jambes
+    float posX_jambe = -0.5f;
+    myEngine.setFlatColor(0.31f, 0.365f, 0.627f);
+    for (int i = 0; i < 2; i++)
+    {
+        myEngine.mvMatrixStack.pushMatrix();
+        myEngine.mvMatrixStack.addTranslation({posX_jambe, 0, 0.2});
+        myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1});
+        myEngine.mvMatrixStack.addHomothety({0.5, 0.65, 0.9});
+        myEngine.updateMvMatrix();
+        bodyCylinder->draw();
+        myEngine.mvMatrixStack.popMatrix();
+        posX_jambe += 1;
+    }
+
+    // pieds
+    float posX_pied = -0.5f;
+    myEngine.setFlatColor(0.05f, 0.05f, 0.05f);
+    for (int i = 0; i < 2; i++)
+    {
+        myEngine.mvMatrixStack.pushMatrix();
+        myEngine.mvMatrixStack.addTranslation({posX_pied, 0.4, 0.1});
+        myEngine.mvMatrixStack.addHomothety({0.9, 2, 0.2});
+        myEngine.updateMvMatrix();
+        bodyCube->draw();
+        myEngine.mvMatrixStack.popMatrix();
+        posX_pied += 1;
+    }
+
+    // bras
+    float posX_bras = -2.0f;
+    myEngine.setFlatColor(0.616f, 0.369f, 0.314f);
+    for (int i = 0; i < 2; i++)
+    {
+        myEngine.mvMatrixStack.pushMatrix();
+        myEngine.mvMatrixStack.addTranslation({posX_bras, 0, 2});
+        myEngine.mvMatrixStack.addRotation(M_PI, {1, 1, 0});
+        myEngine.mvMatrixStack.addHomothety({0.2, 1, 0.2});
+        myEngine.updateMvMatrix();
+        bodyCylinder->draw();
+        myEngine.mvMatrixStack.popMatrix();
+        posX_bras += 3;
+    }
+
+    // mains
+    float posX_main = -2.0f;
+    myEngine.setFlatColor(0.851f, 0.141f, 0.255f);
+    for (int i = 0; i < 2; i++)
+    {
+        myEngine.mvMatrixStack.pushMatrix();
+        myEngine.mvMatrixStack.addTranslation({posX_main, 0, 2});
+        myEngine.mvMatrixStack.addHomothety({0.4, 0.4, 0.4});
+        myEngine.updateMvMatrix();
+        sphere->draw();
+        myEngine.mvMatrixStack.popMatrix();
+        posX_main += 4;
+    }
+
+    // bonnet
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(0.31f, 0.365f, 0.627f);
+    myEngine.mvMatrixStack.addTranslation({0, 0, 4.4});
+    myEngine.mvMatrixStack.addHomothety({1.15, 1.15, 0.8});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+     // bas
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(0.851f, 0.141f, 0.255f);
+    myEngine.mvMatrixStack.addTranslation({0, 0, 4});
+    myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1});
+    myEngine.mvMatrixStack.addHomothety({1.15, 0.3, 1.15});
+    myEngine.updateMvMatrix();
+    bodyCylinder->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
+    //pompom
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.mvMatrixStack.addTranslation({0, 0, 5.4});
+    myEngine.mvMatrixStack.addHomothety({0.4, 0.4, 0.4});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+
 }
