@@ -73,6 +73,7 @@ void drawScene()
 	drawRails();
 	drawStation();
 	drawRandomSapins();
+	drawRandomShrooms();
 
 	animate += 0.02f;
 	armAnimationSlow = sin(animate*3) * 0.8f; // pour que ca fasse des allé retour entre 0.8 et -0.8

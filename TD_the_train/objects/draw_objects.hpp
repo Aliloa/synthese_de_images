@@ -13,6 +13,7 @@ extern GLBI_Engine myEngine;
 
 void initObjects();
 void drawSapin();
+void drawRandomShrooms();
 void drawRandomSapins();
 void drawKyle(float handAnimation);
 void drawStan(float handAnimation);

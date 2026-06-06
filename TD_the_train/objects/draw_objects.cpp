@@ -14,6 +14,8 @@ IndexedMesh *bodyCylinder;
 // textures
 glbasimac::GLBI_Texture textureFeuillage;
 glbasimac::GLBI_Texture textureTronc;
+glbasimac::GLBI_Texture textureMushroom;
+glbasimac::GLBI_Texture textureMushroomBottom;
 
 void initObjects()
 {
@@ -60,6 +62,32 @@ void initObjects()
     textureTronc.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
     textureTronc.detachTexture();
     stbi_image_free(pixelsBois);
+
+    // mushroom
+    textureMushroom.createTexture();
+    int w2, h2, n2;
+    unsigned char *pixelsMushroom = stbi_load("../assets/textures/mushroom.png", &w2, &h2, &n2, 0);
+    textureMushroom.attachTexture();
+    textureMushroom.loadImage(w2, h2, n2, pixelsMushroom);
+    textureMushroom.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    textureMushroom.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    textureMushroom.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    textureMushroom.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
+    textureMushroom.detachTexture();
+    stbi_image_free(pixelsMushroom);
+
+    // mushroomBottom
+    textureMushroomBottom.createTexture();
+    int w3, h3, n3;
+    unsigned char *pixelsMushroomBottom = stbi_load("../assets/textures/mushroom_bottom.png", &w3, &h3, &n3, 0);
+    textureMushroomBottom.attachTexture();
+    textureMushroomBottom.loadImage(w3, h3, n3, pixelsMushroomBottom);
+    textureMushroomBottom.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    textureMushroomBottom.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    textureMushroomBottom.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    textureMushroomBottom.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
+    textureMushroomBottom.detachTexture();
+    stbi_image_free(pixelsMushroomBottom);
 }
 
 void drawSapin()
@@ -95,6 +123,34 @@ void drawSapin()
     myEngine.mvMatrixStack.popMatrix();
 }
 
+void drawMushroom()
+{
+    // Bas
+    // myEngine.setFlatColor(0.941f, 0.894f, 0.792f);
+    myEngine.activateTexturing(true);
+    textureMushroomBottom.attachTexture();
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1});
+    myEngine.mvMatrixStack.addHomothety({0.9, 1.8, 0.9});
+    myEngine.updateMvMatrix();
+    tronc->draw();
+    myEngine.mvMatrixStack.popMatrix();
+    textureMushroomBottom.detachTexture();
+
+    // //Chapeau
+    myEngine.mvMatrixStack.pushMatrix();
+    // myEngine.setFlatColor(0.871f, 0.251f, 0.169f);
+    textureMushroom.attachTexture();
+    myEngine.mvMatrixStack.addTranslation({0, 0, 2.2});
+    myEngine.mvMatrixStack.addHomothety({1.9, 1.9, 1.2});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+
+    textureMushroom.detachTexture();
+    myEngine.activateTexturing(false);
+    myEngine.mvMatrixStack.popMatrix();
+}
+
 // Zone ou y a la gare pour éviter de mettre des objets par dessus
 bool zoneGare(int x, int z)
 {
@@ -118,6 +174,28 @@ void drawRandomSapins()
         myEngine.mvMatrixStack.pushMatrix();
         myEngine.mvMatrixStack.addTranslation({posX, posY, 0});
         drawSapin();
+        myEngine.mvMatrixStack.popMatrix();
+    }
+}
+
+void drawRandomShrooms()
+{
+    srand(51);
+    float posX = 0;
+    float posY = 0;
+    for (int i = 0; i < 20; i++)
+    {
+        posX = (rand() % 95) - 45; // -50 à +50
+        posY = (rand() % 95) - 45; // -50 à +50
+        if (zoneGare(posX, posY))
+        {
+            i--;
+            continue;
+        } // réessaie
+        myEngine.mvMatrixStack.pushMatrix();
+        myEngine.mvMatrixStack.addTranslation({posX, posY, 0});
+        myEngine.mvMatrixStack.addHomothety({0.5, 0.5, 0.5});
+        drawMushroom();
         myEngine.mvMatrixStack.popMatrix();
     }
 }
@@ -270,7 +348,7 @@ void drawBody(Color body_color, Color collar_color, Color legs_color, Color hand
 
     myEngine.mvMatrixStack.pushMatrix();
     myEngine.mvMatrixStack.addTranslation({-0.9, 0, 2});
-    myEngine.mvMatrixStack.addRotation(M_PI-0.7, {0, 1, 0});
+    myEngine.mvMatrixStack.addRotation(M_PI - 0.7, {0, 1, 0});
     drawArm(body_color, hands_color);
     myEngine.mvMatrixStack.popMatrix();
 
@@ -384,8 +462,8 @@ void drawStan(float handAnimation)
              {0.851f, 0.141f, 0.255f}); // mains
     drawHat({0.31f, 0.365f, 0.627f},    // chapeau
             {0.851f, 0.141f, 0.255f});
-            drawAnimatedArm({0.616f, 0.369f, 0.314f}, // corps
-                    {0.851f, 0.141f, 0.255f}, //main
+    drawAnimatedArm({0.616f, 0.369f, 0.314f}, // corps
+                    {0.851f, 0.141f, 0.255f}, // main
                     handAnimation);
 }
 
