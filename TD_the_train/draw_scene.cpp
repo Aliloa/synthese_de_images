@@ -79,12 +79,17 @@ void drawScene()
 	armAnimationSlow = sin(animate*3) * 0.8f; // pour que ca fasse des allé retour entre 0.8 et -0.8
 	armAnimationFast = sin(animate*10) * 0.8f;	// pour que ca fasse des allé retour + rapide
 
-	drawKyle(armAnimationSlow);
 	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.mvMatrixStack.addTranslation({8, 0, 0});
+	myEngine.mvMatrixStack.addTranslation({-19, 5, 0});
+	myEngine.mvMatrixStack.addRotation(M_PI/2, {0, 0, 1});
+	myEngine.mvMatrixStack.addRotation(M_PI, {0, 0, 1});
+	myEngine.mvMatrixStack.addHomothety({0.8, 0.8, 0.8});
+	drawKyle(armAnimationSlow);
+	// myEngine.mvMatrixStack.pushMatrix();
+	myEngine.mvMatrixStack.addTranslation({5, 0, 0});
 	drawStan(armAnimationFast);
-	// myEngine.mvMatrixStack.addTranslation({8, 0, 0});
-	// drawCartman();
+	myEngine.mvMatrixStack.addTranslation({6, 0, 0});
+	drawCartman(armAnimationSlow);
 	myEngine.mvMatrixStack.popMatrix();
 	drawTrain();
 }

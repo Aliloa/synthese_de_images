@@ -468,7 +468,7 @@ void drawStan(float handAnimation)
 }
 
 // CARTMAN
-void drawCartman()
+void drawCartman(float handAnimation)
 {
     myEngine.mvMatrixStack.addHomothety({1.5, 1.2, 1});
     drawBody({0.843f, 0.129f, 0.255f}, // corps
@@ -477,4 +477,8 @@ void drawCartman()
              {0.98f, 0.882f, 0.016f}); // mains
     drawHat({0.275f, 0.698f, 0.725f},  // chapeau
             {0.976f, 0.867f, 0.004f});
+
+            drawAnimatedArm({0.843f, 0.129f, 0.255f}, // corps
+                    {0.98f, 0.882f, 0.016f}, // main
+                    handAnimation);
 }

@@ -17,4 +17,4 @@ void drawRandomShrooms();
 void drawRandomSapins();
 void drawKyle(float handAnimation);
 void drawStan(float handAnimation);
-void drawCartman();
+void drawCartman(float handAnimation);

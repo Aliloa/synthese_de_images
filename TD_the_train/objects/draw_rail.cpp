@@ -9,7 +9,6 @@ IndexedMesh *cube;
 GLBI_Convex_2D_Shape rail_courbe{3};
 
 glbasimac::GLBI_Texture textureBallast;
-glbasimac::GLBI_Texture textureMetal;
 
 const float POS_X_RAIL1 = 3.f; // rail1
 const float POS_X_RAIL2 = 7.f; // rail 2

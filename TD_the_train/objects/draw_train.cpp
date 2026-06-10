@@ -1,11 +1,18 @@
 #include "draw_train.hpp"
 #include <iostream>
 #include <cmath>
+#include "glbasimac/glbi_texture.hpp"
+#include "tools/stb_image.h"
 
 static IndexedMesh *corps = nullptr;
 static IndexedMesh *roue = nullptr;
 static IndexedMesh *cheminee = nullptr;
 static IndexedMesh *wagon = nullptr;
+
+glbasimac::GLBI_Texture textureMetalRouge;
+glbasimac::GLBI_Texture textureMetalBleu;
+glbasimac::GLBI_Texture textureCheminee;
+glbasimac::GLBI_Texture textureRoue;
 
 void initTrain()
 {
@@ -18,12 +25,67 @@ void initTrain()
   roue->createVAO();
   cheminee->createVAO();
   wagon->createVAO();
+
+  // textures
+  // wagon rouge
+  textureMetalRouge.createTexture();
+  int w1, h1, n1;
+  unsigned char *pixelsMetalRouge = stbi_load("../assets/textures/red_metal.png", &w1, &h1, &n1, 0);
+  textureMetalRouge.attachTexture();
+  textureMetalRouge.loadImage(w1, h1, n1, pixelsMetalRouge);
+  textureMetalRouge.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  textureMetalRouge.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  textureMetalRouge.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  textureMetalRouge.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  textureMetalRouge.detachTexture();
+  stbi_image_free(pixelsMetalRouge);
+
+  // wagon bleu
+  textureMetalBleu.createTexture();
+  int w2, h2, n2;
+  unsigned char *pixelsMetalBleu = stbi_load("../assets/textures/blue_metal.png", &w2, &h2, &n2, 0);
+  textureMetalBleu.attachTexture();
+  textureMetalBleu.loadImage(w2, h2, n2, pixelsMetalBleu);
+  textureMetalBleu.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  textureMetalBleu.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  textureMetalBleu.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  textureMetalBleu.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  textureMetalBleu.detachTexture();
+  stbi_image_free(pixelsMetalBleu);
+
+  // cheminée
+  textureCheminee.createTexture();
+  int w3, h3, n3;
+  unsigned char *pixelsCheminee = stbi_load("../assets/textures/chemine.png", &w3, &h3, &n3, 0);
+  textureCheminee.attachTexture();
+  textureCheminee.loadImage(w3, h3, n3, pixelsCheminee);
+  textureCheminee.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  textureCheminee.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  textureCheminee.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  textureCheminee.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  textureCheminee.detachTexture();
+  stbi_image_free(pixelsCheminee);
+
+  // wheel
+  textureRoue.createTexture();
+  int w4, h4, n4;
+  unsigned char *pixelsRoue = stbi_load("../assets/textures/wheel.png", &w4, &h4, &n4, 0);
+  textureRoue.attachTexture();
+  textureRoue.loadImage(w4, h4, n4, pixelsRoue);
+  textureRoue.setParameters(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  textureRoue.setParameters(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  textureRoue.setParameters(GL_TEXTURE_WRAP_S, GL_REPEAT);
+  textureRoue.setParameters(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  textureRoue.detachTexture();
+  stbi_image_free(pixelsRoue);
 }
 
 void drawLocomotive()
 {
   myEngine.mvMatrixStack.pushMatrix();
-  myEngine.setFlatColor(0.8f, 0.1f, 0.1f);
+  myEngine.activateTexturing(true);
+  textureMetalRouge.attachTexture();
+  // myEngine.setFlatColor(0.8f, 0.1f, 0.1f);
   myEngine.mvMatrixStack.addTranslation({0.f, 0.f, 2.0f});
   myEngine.mvMatrixStack.addHomothety({8.f, 4.f, 3.f});
   myEngine.updateMvMatrix();
@@ -39,18 +101,27 @@ void drawLocomotive()
   corps->draw();
   myEngine.mvMatrixStack.popMatrix();
 
+  textureMetalRouge.detachTexture();
+  myEngine.activateTexturing(false);
+
   // Cheminée
   myEngine.mvMatrixStack.pushMatrix();
-  myEngine.setFlatColor(0.2f, 0.2f, 0.2f);
-  myEngine.mvMatrixStack.addTranslation({0.f, 0.f, 4.5f});
+  // myEngine.setFlatColor(0.2f, 0.2f, 0.2f);
+  myEngine.activateTexturing(true);
+  textureCheminee.attachTexture();
+  myEngine.mvMatrixStack.addTranslation({-1.f, 0.f, 4.5f});
   myEngine.mvMatrixStack.addRotation(M_PI, {0, 1, 1});
   myEngine.mvMatrixStack.addHomothety({0.6f, 2.5f, 0.6f});
   myEngine.updateMvMatrix();
   cheminee->draw();
   myEngine.mvMatrixStack.popMatrix();
+  textureCheminee.detachTexture();
+  myEngine.activateTexturing(false);
 
   // 4 Roues
-  myEngine.setFlatColor(0.15f, 0.15f, 0.15f);
+  // myEngine.setFlatColor(0.15f, 0.15f, 0.15f);
+  myEngine.activateTexturing(true);
+  textureRoue.attachTexture();
   float roueX[2] = {2.f, -2.f};
   float roueY[2] = {-2.3f, 2.3f};
   for (int i = 0; i < 2; i++)
@@ -66,6 +137,8 @@ void drawLocomotive()
       myEngine.mvMatrixStack.popMatrix();
     }
   }
+  textureRoue.detachTexture();
+  myEngine.activateTexturing(false);
 }
 
 void drawWagon(float offsetX)
@@ -74,15 +147,21 @@ void drawWagon(float offsetX)
   myEngine.mvMatrixStack.addTranslation({offsetX, 0.f, 0.f});
 
   myEngine.mvMatrixStack.pushMatrix();
-  myEngine.setFlatColor(0.3f, 0.3f, 0.7f); // bleu
+  // myEngine.setFlatColor(0.3f, 0.3f, 0.7f); // bleu
+  myEngine.activateTexturing(true);
+  textureMetalBleu.attachTexture();
   myEngine.mvMatrixStack.addTranslation({0.f, 0.f, 2.0f});
   myEngine.mvMatrixStack.addHomothety({7.f, 4.f, 3.f});
   myEngine.updateMvMatrix();
   wagon->draw();
   myEngine.mvMatrixStack.popMatrix();
+  textureMetalBleu.detachTexture();
+  myEngine.activateTexturing(false);
 
   // 4 roues wagon
-  myEngine.setFlatColor(0.15f, 0.15f, 0.15f);
+  // myEngine.setFlatColor(0.15f, 0.15f, 0.15f);
+  myEngine.activateTexturing(true);
+  textureRoue.attachTexture();
   float roueX[2] = {2.f, -2.f};
   float roueY[2] = {-2.3f, 2.3f};
   for (int i = 0; i < 2; i++)
@@ -98,6 +177,8 @@ void drawWagon(float offsetX)
       myEngine.mvMatrixStack.popMatrix();
     }
   }
+  textureRoue.detachTexture();
+  myEngine.activateTexturing(false);
 
   myEngine.mvMatrixStack.popMatrix();
 }
