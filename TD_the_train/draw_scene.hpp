@@ -16,6 +16,7 @@ extern float cam_x;
 extern float cam_y;
 extern float cam_z;
 extern float cam_angle;
+extern bool lightingMode; // false => flat true => réaliste
 
 struct Circuit
 {
