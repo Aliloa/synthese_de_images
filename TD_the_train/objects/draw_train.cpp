@@ -137,8 +137,18 @@ void drawLocomotive()
       myEngine.mvMatrixStack.popMatrix();
     }
   }
+
   textureRoue.detachTexture();
   myEngine.activateTexturing(false);
+
+  // Phare avant
+  myEngine.mvMatrixStack.pushMatrix();
+  myEngine.setFlatColor(1.f, 1.f, 0.2f);
+  myEngine.mvMatrixStack.addTranslation({4.f, 0.f, 2.f});
+  myEngine.mvMatrixStack.addHomothety({0.5f, 0.5f, 0.5f});
+  myEngine.updateMvMatrix();
+  roue->draw();
+  myEngine.mvMatrixStack.popMatrix();
 }
 
 void drawWagon(float offsetX)

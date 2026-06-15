@@ -18,3 +18,5 @@ void drawRandomSapins();
 void drawKyle(float handAnimation);
 void drawStan(float handAnimation);
 void drawCartman(float handAnimation);
+void drawSoleil();
+void drawLune();

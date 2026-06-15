@@ -478,7 +478,29 @@ void drawCartman(float handAnimation)
     drawHat({0.275f, 0.698f, 0.725f},  // chapeau
             {0.976f, 0.867f, 0.004f});
 
-            drawAnimatedArm({0.843f, 0.129f, 0.255f}, // corps
-                    {0.98f, 0.882f, 0.016f}, // main
+    drawAnimatedArm({0.843f, 0.129f, 0.255f}, // corps
+                    {0.98f, 0.882f, 0.016f},  // main
                     handAnimation);
+}
+
+void drawSoleil()
+{
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(1.f, 0.95f, 0.2f);
+    myEngine.mvMatrixStack.addTranslation({30.f, 30.f, 25.f});
+    myEngine.mvMatrixStack.addHomothety({4.f, 4.f, 4.f});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
+}
+
+void drawLune()
+{
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.setFlatColor(0.9f, 0.9f, 0.85f);
+    myEngine.mvMatrixStack.addTranslation({30.f, 30.f, 25.f});
+    myEngine.mvMatrixStack.addHomothety({3.f, 3.f, 3.f});
+    myEngine.updateMvMatrix();
+    sphere->draw();
+    myEngine.mvMatrixStack.popMatrix();
 }

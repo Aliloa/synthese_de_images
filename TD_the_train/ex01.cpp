@@ -8,6 +8,7 @@
 using namespace glbasimac;
 using namespace STP3D;
 
+extern bool lightingMode;
 static bool mousePressed = false;
 static double lastMouseX = 0.0;
 static double lastMouseY = 0.0;
@@ -55,6 +56,10 @@ void onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int /*mods
 
 	default:
 		break;
+	case GLFW_KEY_F:
+		if (is_pressed)
+			lightingMode = !lightingMode;
+		break;
 	}
 }
 
@@ -94,19 +99,35 @@ void onMouseMove(GLFWwindow * /*window*/, double xpos, double ypos)
 	cam_angle -= (float)dx * 0.2f; //- sinon c'est inversé
 }
 
-void processMovement(GLFWwindow* window, float dt)
+void processMovement(GLFWwindow *window, float dt)
 {
-    float speed = 10.f * dt;
-    float rad   = cam_angle * M_PI / 180.f;
-    float fx = cosf(rad); // forward X
-    float fy = sinf(rad); // forward Y
-    float sx = -fy; // strafe X (perpendiculaire)
-    float sy =  fx; // strafe Y
+	float speed = 10.f * dt;
+	float rad = cam_angle * M_PI / 180.f;
+	float fx = cosf(rad); // forward X
+	float fy = sinf(rad); // forward Y
+	float sx = -fy;				// strafe X (perpendiculaire)
+	float sy = fx;				// strafe Y
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) { cam_x += fx*speed; cam_y += fy*speed; } // Z azerty
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) { cam_x -= fx*speed; cam_y -= fy*speed; } // S azerty
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) { cam_x += sx*speed; cam_y += sy*speed; } // Q azerty
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { cam_x -= sx*speed; cam_y -= sy*speed; } // D azerty
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		cam_x += fx * speed;
+		cam_y += fy * speed;
+	} // Z azerty
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		cam_x -= fx * speed;
+		cam_y -= fy * speed;
+	} // S azerty
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		cam_x += sx * speed;
+		cam_y += sy * speed;
+	} // Q azerty
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		cam_x -= sx * speed;
+		cam_y -= sy * speed;
+	} // D azerty
 }
 
 // Ajouter aussi le scroll pour le zoom
@@ -116,16 +137,16 @@ void processMovement(GLFWwindow* window, float dt)
 // 	if (dist_zoom < 1.0f)
 // 		dist_zoom = 1.0f;
 // }
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
-	//initialisation de l'argument le nom du fichier JSON à charger
-	 if (argc < 2) {
-        std::cerr << "erreur : donnez un fichier JSON" << std::endl;
-        std::cerr << "usage : " << argv[0] << " scene.json" << std::endl;
-        return -1;
-    }
+	if (argc < 2)
+	{
+		std::cerr << "erreur : donnez un fichier JSON" << std::endl;
+		std::cerr << "usage : " << argv[0] << " scene.json" << std::endl;
+		return -1;
+	}
 
-    std::string jsonFile = argv[1];
+	std::string jsonFile = argv[1];
 	/* GLFW initialisation */
 	GLFWwindow *window;
 	if (!glfwInit())
@@ -175,7 +196,7 @@ int main(int argc, char ** argv)
 	CHECK_GL;
 
 	initScene(jsonFile);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //pour ne plus voir le curseur dc la souris
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
 	double elapsedTime{0.0};
 
@@ -188,8 +209,7 @@ int main(int argc, char ** argv)
 		processMovement(window, (float)elapsedTime);
 
 		/* Render begins here */
-		glClearColor(0.5f, 0.7f, 0.9f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		// TO DO EX01 part 2
 		myEngine.set3DProjection(60.0f, aspectRatio, 0.1f, 500.0f);
 		// TO DO EX01 part 3
