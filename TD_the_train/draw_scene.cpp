@@ -40,9 +40,9 @@ void loadCircuit(const std::string &filename)
 void initScene(const std::string &jsonFile)
 {
 	loadCircuit(jsonFile);
-	std::cout << "size_grid: " << circuit.size_grid << std::endl;
-	for (auto &point : circuit.path)
-		std::cout << "  " << point.first << ", " << point.second << std::endl;
+	// std::cout << "size_grid: " << circuit.size_grid << std::endl;
+	// for (auto &point : circuit.path)
+	// 	std::cout << "  " << point.first << ", " << point.second << std::endl;
 
 	initGround();
 	initRail();
