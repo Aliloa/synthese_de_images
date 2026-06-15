@@ -69,8 +69,7 @@ void drawScene()
 
 	if (lightingMode)
 	{
-		// === NUIT : Phong avec lune + phare ===
-		glClearColor(0.05f, 0.05f, 0.15f, 1.0f); // ciel nuit bleu foncé
+		glClearColor(0.05f, 0.05f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		myEngine.switchToPhongShading();
@@ -78,16 +77,13 @@ void drawScene()
 
 		if (!lightsInitialized)
 		{
-			// Lumière lune (directionnelle, w=0, bleu-blanc froid)
 			myEngine.addALight(
 					STP3D::Vector4D(30.f, 30.f, 25.f, 0.f),
-					STP3D::Vector3D(20.f, 20.f, 20.f) // lumière froide de lune
-			);
+					STP3D::Vector3D(20.f, 20.f, 20.f));
 			myEngine.setShininess(16.f);
 			lightsInitialized = true;
 		}
 
-		// Position phare mise à jour chaque frame
 		int idx = circuit.train_pos;
 		int next = (idx + 1) % (int)circuit.path.size();
 		float posX = circuit.path[idx].first * circuit.size_grid + circuit.size_grid / 2.f;
@@ -111,7 +107,6 @@ void drawScene()
 		drawRandomSapins();
 		drawRandomShrooms();
 
-		// Dessine la lune en flat par dessus (switch temporaire)
 		myEngine.switchToFlatShading();
 		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 		myEngine.updateMvMatrix();
@@ -123,8 +118,7 @@ void drawScene()
 	}
 	else
 	{
-		// === JOUR : Flat avec soleil ===
-		glClearColor(0.5f, 0.7f, 0.9f, 1.0f); // ciel bleu jour
+		glClearColor(0.5f, 0.7f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		myEngine.switchToFlatShading();

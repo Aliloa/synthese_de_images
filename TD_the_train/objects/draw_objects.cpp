@@ -486,9 +486,9 @@ void drawCartman(float handAnimation)
 void drawSoleil()
 {
     myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(1.f, 0.95f, 0.2f);                   // jaune
-    myEngine.mvMatrixStack.addTranslation({30.f, 30.f, 25.f}); // position dans le ciel
-    myEngine.mvMatrixStack.addHomothety({4.f, 4.f, 4.f});      // grosse sphère
+    myEngine.setFlatColor(1.f, 0.95f, 0.2f);
+    myEngine.mvMatrixStack.addTranslation({30.f, 30.f, 25.f});
+    myEngine.mvMatrixStack.addHomothety({4.f, 4.f, 4.f});
     myEngine.updateMvMatrix();
     sphere->draw();
     myEngine.mvMatrixStack.popMatrix();
@@ -497,9 +497,9 @@ void drawSoleil()
 void drawLune()
 {
     myEngine.mvMatrixStack.pushMatrix();
-    myEngine.setFlatColor(0.9f, 0.9f, 0.85f);                  // blanc grisé
-    myEngine.mvMatrixStack.addTranslation({30.f, 30.f, 25.f}); // même position
-    myEngine.mvMatrixStack.addHomothety({3.f, 3.f, 3.f});      // un peu plus petite
+    myEngine.setFlatColor(0.9f, 0.9f, 0.85f);
+    myEngine.mvMatrixStack.addTranslation({30.f, 30.f, 25.f});
+    myEngine.mvMatrixStack.addHomothety({3.f, 3.f, 3.f});
     myEngine.updateMvMatrix();
     sphere->draw();
     myEngine.mvMatrixStack.popMatrix();
