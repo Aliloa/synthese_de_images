@@ -213,8 +213,7 @@ int main(int argc, char **argv)
 		processMovement(window, (float)elapsedTime);
 
 		/* Render begins here */
-		glClearColor(0.5f, 0.7f, 0.9f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		// TO DO EX01 part 2
 		myEngine.set3DProjection(60.0f, aspectRatio, 0.1f, 500.0f);
 		// TO DO EX01 part 3
