@@ -43,9 +43,6 @@ void loadCircuit(const std::string &filename)
 void initScene(const std::string &jsonFile)
 {
 	loadCircuit(jsonFile);
-	// std::cout << "size_grid: " << circuit.size_grid << std::endl;
-	// for (auto &point : circuit.path)
-	// 	std::cout << "  " << point.first << ", " << point.second << std::endl;
 
 	initGround();
 	initRail();
@@ -92,41 +89,54 @@ void drawScene()
 
 	if (lightingMode)
 	{
-		// === NUIT ===
+		// NUIT
 		glClearColor(0.02f, 0.02f, 0.08f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (!lightsInitialized)
 		{
-			// Lumière 0 : lune froide très faible
-			myEngine.addALight(
-					STP3D::Vector4D(0.f, 0.f, 1.f, 0.f),
-					STP3D::Vector3D(0.12f, 0.12f, 0.2f));
+			float stationX = (circuit.station.first - 5) * 10.0f;
+			float stationY = (circuit.station.second - 5) * 10.0f + 10.0f;
 
-			// Lumière 1 : phare du train (jaune doux, pas trop fort)
+			// Lumière 0 : lune froide inclinée
+			myEngine.addALight(
+					STP3D::Vector4D(0.3f, 0.2f, 1.f, 0.f),
+					STP3D::Vector3D(0.14f, 0.15f, 0.22f));
+
+			// Lumière 1 : phare du train
 			myEngine.addALight(
 					STP3D::Vector4D(phareX, phareY, 3.f, 1.f),
 					phareOn
 							? STP3D::Vector3D(3.f, 3.f, 2.f)
 							: STP3D::Vector3D(0.f, 0.f, 0.f));
 
-			// Lumière 2 : ambiance très faible depuis le bas
+			// Lumière 2 : ambiance +X/-Y
+			myEngine.addALight(
+					STP3D::Vector4D(1.f, -1.f, 0.5f, 0.f),
+					STP3D::Vector3D(0.10f, 0.11f, 0.16f));
+
+			// Lumière 3 : ambiance -X/+Y
+			myEngine.addALight(
+					STP3D::Vector4D(-1.f, 1.f, 0.5f, 0.f),
+					STP3D::Vector3D(0.10f, 0.11f, 0.16f));
+
+			// Lumière 4 : fill bas
 			myEngine.addALight(
 					STP3D::Vector4D(0.f, 0.f, -1.f, 0.f),
-					STP3D::Vector3D(0.05f, 0.05f, 0.08f));
+					STP3D::Vector3D(0.08f, 0.09f, 0.13f));
 
-			// Lumière 3 : latérale gauche
+			// Lumière 5 : spot sous les personnages (remonte de bas)
 			myEngine.addALight(
-					STP3D::Vector4D(1.f, 0.f, 0.f, 0.f),
-					STP3D::Vector3D(0.04f, 0.04f, 0.07f));
+					STP3D::Vector4D(-19.f, 5.f, 0.5f, 1.f),
+					STP3D::Vector3D(1.2f, 1.1f, 0.9f));
 
-			// Lumière 4 : latérale droite
+			// Lumière 6 : éclairage centre de la gare (entre les rails)
 			myEngine.addALight(
-					STP3D::Vector4D(-1.f, 0.f, 0.f, 0.f),
-					STP3D::Vector3D(0.04f, 0.04f, 0.07f));
+					STP3D::Vector4D(stationX, stationY, 4.f, 1.f),
+					STP3D::Vector3D(1.0f, 0.95f, 0.8f));
 
-			myEngine.setShininess(8.f);
-			myEngine.setSpecularColor(STP3D::Vector3D(0.3f, 0.3f, 0.3f));
+			myEngine.setShininess(12.f);
+			myEngine.setSpecularColor(STP3D::Vector3D(0.10f, 0.12f, 0.18f));
 			myEngine.setAttenuationFactor(STP3D::Vector3D(1.f, 0.05f, 0.005f));
 			lightsInitialized = true;
 		}
@@ -140,11 +150,12 @@ void drawScene()
 						: STP3D::Vector3D(0.f, 0.f, 0.f),
 				1);
 
-		// Sol en flat vert pur la nuit
+		// Sol et rails en flat (garde leurs couleurs exactes)
 		myEngine.switchToFlatShading();
 		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 		myEngine.updateMvMatrix();
 		drawGround();
+		drawRails();
 
 		if (!flatMode)
 		{
@@ -156,7 +167,6 @@ void drawScene()
 		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 		myEngine.updateMvMatrix();
 
-		drawRails();
 		drawStation();
 		drawRandomSapins();
 		drawRandomShrooms();
@@ -178,53 +188,62 @@ void drawScene()
 	}
 	else
 	{
-		// === JOUR ===
+		// JOUR
 		glClearColor(0.5f, 0.7f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		if (!lightsInitialized)
 		{
-			// Lumière 0 : soleil zénith blanc, modéré
-			myEngine.addALight(
-					STP3D::Vector4D(0.f, 0.f, 1.f, 0.f),
-					STP3D::Vector3D(0.7f, 0.7f, 0.7f));
+			float stationX = (circuit.station.first - 5) * 10.0f;
+			float stationY = (circuit.station.second - 5) * 10.0f + 10.0f;
 
-			// Lumière 1 : fill bas (ciel réfléchi)
+			// Lumière 0 : soleil incliné blanc neutre
+			myEngine.addALight(
+					STP3D::Vector4D(0.6f, 0.4f, 1.f, 0.f),
+					STP3D::Vector3D(0.65f, 0.65f, 0.63f));
+
+			// Lumière 1 : fill ciel bleuté + côté ombre fort
+			myEngine.addALight(
+					STP3D::Vector4D(-0.6f, -0.4f, 0.5f, 0.f),
+					STP3D::Vector3D(0.30f, 0.30f, 0.33f));
+
+			// Lumière 2 : fill +X (faces latérales des rails)
+			myEngine.addALight(
+					STP3D::Vector4D(1.f, 0.f, 0.2f, 0.f),
+					STP3D::Vector3D(0.18f, 0.18f, 0.19f));
+
+			// Lumière 3 : fill -X opposé
+			myEngine.addALight(
+					STP3D::Vector4D(-1.f, 0.f, 0.2f, 0.f),
+					STP3D::Vector3D(0.18f, 0.18f, 0.19f));
+
+			// Lumière 4 : fill bas (réflexion sol)
 			myEngine.addALight(
 					STP3D::Vector4D(0.f, 0.f, -1.f, 0.f),
-					STP3D::Vector3D(0.25f, 0.25f, 0.25f));
+					STP3D::Vector3D(0.14f, 0.14f, 0.13f));
 
-			// Lumière 2 : fill avant
+			// Lumière 5 : spot sous les personnages
 			myEngine.addALight(
-					STP3D::Vector4D(0.f, 1.f, 0.f, 0.f),
-					STP3D::Vector3D(0.2f, 0.2f, 0.2f));
+					STP3D::Vector4D(-19.f, 5.f, 0.5f, 1.f),
+					STP3D::Vector3D(1.5f, 1.4f, 1.2f));
 
-			// Lumière 3 : fill arrière
+			// Lumière 6 : éclairage centre de la gare (entre les rails)
 			myEngine.addALight(
-					STP3D::Vector4D(0.f, -1.f, 0.f, 0.f),
-					STP3D::Vector3D(0.2f, 0.2f, 0.2f));
+					STP3D::Vector4D(stationX, stationY, 4.f, 1.f),
+					STP3D::Vector3D(1.2f, 1.2f, 1.1f));
 
-			// Lumière 4 : fill droite
-			myEngine.addALight(
-					STP3D::Vector4D(1.f, 0.f, 0.f, 0.f),
-					STP3D::Vector3D(0.15f, 0.15f, 0.15f));
-
-			// Lumière 5 : fill gauche
-			myEngine.addALight(
-					STP3D::Vector4D(-1.f, 0.f, 0.f, 0.f),
-					STP3D::Vector3D(0.15f, 0.15f, 0.15f));
-
-			myEngine.setShininess(4.f);
-			myEngine.setSpecularColor(STP3D::Vector3D(1.f, 1.f, 1.f));
+			myEngine.setShininess(20.f);
+			myEngine.setSpecularColor(STP3D::Vector3D(0.20f, 0.20f, 0.20f));
 			myEngine.setAttenuationFactor(STP3D::Vector3D(1.f, 0.0f, 0.0f));
 			lightsInitialized = true;
 		}
 
-		// Sol en flat vert sans ombres
+		// Sol et rails en flat (garde leurs couleurs exactes, pas de noir)
 		myEngine.switchToFlatShading();
 		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 		myEngine.updateMvMatrix();
 		drawGround();
+		drawRails();
 
 		if (!flatMode)
 		{
@@ -236,7 +255,6 @@ void drawScene()
 		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 		myEngine.updateMvMatrix();
 
-		drawRails();
 		drawStation();
 		drawRandomSapins();
 		drawRandomShrooms();
