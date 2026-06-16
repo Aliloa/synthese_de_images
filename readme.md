@@ -11,7 +11,6 @@ cmake --build .
 cd ../build ; cmake --build . ; cd ../bin ; ./TD_the_train_ex01.exe ../TD_the_train/circuit.json
 
 # Touches utiles:
-# Touches utiles
 
 - W/A/S/D: se déplacer
 - Souris : orienter la caméra
