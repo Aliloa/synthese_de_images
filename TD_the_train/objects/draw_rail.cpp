@@ -25,7 +25,7 @@ void initRail()
     cylinder->createVAO();
 
     // textures
-    // ballast
+    //ballast
     textureBallast.createTexture();
     int w, h, n;
     stbi_set_flip_vertically_on_load(true); // OpenGL attend l'origine en bas
@@ -216,39 +216,40 @@ void drawRails()
         {
             if (dirX_A == 0) // si ca avance pas sur X
             {
-                myEngine.mvMatrixStack.addRotation(M_PI / 2, {0, 0, 1}); // tourner à 90 degrés
-                myEngine.mvMatrixStack.addTranslation({0, -circuit.size_grid, 0});
-                myEngine.updateMvMatrix();
-                drawRailDroit();
+                myEngine.mvMatrixStack.addRotation(M_PI / 2, {0, 0, 1});           // tourner à 90 degrés
+                myEngine.mvMatrixStack.addTranslation({0, -circuit.size_grid, 0}); // pour recentrer le rail
             }
-            else
-            {
-                // COURBE
-                if (dirX_A == -1 && dirY_B == -1)
-                {
-                    myEngine.mvMatrixStack.addRotation(M_PI / 2, {0, 0, 1});
-                    myEngine.mvMatrixStack.addTranslation({0, -circuit.size_grid, 0});
-                }
-                else if (dirY_A == -1 && dirX_B == 1)
-                {
-                    myEngine.mvMatrixStack.addRotation(M_PI, {0, 0, 1});
-                    myEngine.mvMatrixStack.addTranslation({-circuit.size_grid, -circuit.size_grid, 0});
-                }
-                else if (dirX_A == 1 && dirY_B == 1)
-                {
-                    myEngine.mvMatrixStack.addRotation(3 * M_PI / 2, {0, 0, 1});
-                    myEngine.mvMatrixStack.addTranslation({-circuit.size_grid, 0, 0});
-                }
-                else if (dirY_A == -1 && dirX_B == -1)
-                {
-                    myEngine.mvMatrixStack.addRotation(3 * M_PI / 2, {0, 0, 1});
-                    myEngine.mvMatrixStack.addTranslation({-circuit.size_grid, 0, 0});
-                }
-                myEngine.updateMvMatrix();
-                drawRailCourbe();
-            }
-
-            myEngine.mvMatrixStack.popMatrix();
             myEngine.updateMvMatrix();
+            drawRailDroit();
         }
+        else
+        {
+            // COURBE
+            if (dirX_A == -1 && dirY_B == -1)
+            {
+                myEngine.mvMatrixStack.addRotation(M_PI / 2, {0, 0, 1});
+                myEngine.mvMatrixStack.addTranslation({0, -circuit.size_grid, 0}); // pour recentrer le rail
+            }
+            else if (dirY_A == -1 && dirX_B == 1)
+            {
+                myEngine.mvMatrixStack.addRotation(M_PI, {0, 0, 1});
+                myEngine.mvMatrixStack.addTranslation({-circuit.size_grid, -circuit.size_grid, 0}); // pour recentrer le rail
+            }
+            else if (dirX_A == 1 && dirY_B == 1)
+            {
+                myEngine.mvMatrixStack.addRotation(3 * M_PI / 2, {0, 0, 1});
+                myEngine.mvMatrixStack.addTranslation({-circuit.size_grid, 0, 0}); // pour recentrer le rail
+            }
+            else if (dirY_A == -1 && dirX_B == -1)
+            {
+                myEngine.mvMatrixStack.addRotation(3 * M_PI / 2, {0, 0, 1});
+                myEngine.mvMatrixStack.addTranslation({-circuit.size_grid, 0, 0});
+            }
+            myEngine.updateMvMatrix();
+            drawRailCourbe();
+        }
+
+        myEngine.mvMatrixStack.popMatrix();
+        myEngine.updateMvMatrix();
     }
+}
