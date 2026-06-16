@@ -17,6 +17,10 @@ extern float cam_y;
 extern float cam_z;
 extern float cam_angle;
 
+extern bool lightingMode;
+extern bool lightingEnabled;
+
+
 struct Circuit
 {
     int size_grid;

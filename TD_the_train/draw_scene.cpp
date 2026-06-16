@@ -17,6 +17,11 @@ float cam_angle = 0.f;
 GLBI_Engine myEngine;
 Circuit circuit;
 
+// lumiere
+bool lightingMode = false; // false = jour, true = nuit
+bool lightingEnabled{false};
+IndexedMesh *soleil;
+
 void loadCircuit(const std::string &filename)
 {
 	std::ifstream file(filename);
@@ -49,11 +54,53 @@ void initScene(const std::string &jsonFile)
 	initStation();
 	initObjects();
 	initTrain();
+
+	// lumiere
+	myEngine.switchToPhongShading();
+
+	// Light init
+	myEngine.addALight({0.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f});
+	myEngine.setLightPosition({5.0f, -5.0f, 8.0f, 0.0f}, 0); // soleil
+
+	// fixe param
+	myEngine.setShininess(8.0f);
+	myEngine.setSpecularColor({0.2f, 0.2f, 0.15f});
+	myEngine.setAttenuationFactor({1.0f, 0.05f, 0.01f});
+
+	myEngine.switchToFlatShading();
+
+	// soleil et lune
+	soleil = basicSphere(1.0f);
+	soleil->createVAO();
 }
 
 float animate = 0.0f;
 float armAnimationSlow = 0.0f;
 float armAnimationFast = 0.0f;
+
+void drawSoleil()
+{
+	myEngine.mvMatrixStack.pushMatrix();
+	myEngine.mvMatrixStack.addTranslation({20.f, 20.f, 15.f});
+	myEngine.mvMatrixStack.addHomothety({2.f, 2.f, 2.f});
+	myEngine.updateMvMatrix();
+	myEngine.setFlatColor(1.0f, 0.9f, 0.2f);
+	soleil->draw();
+	myEngine.mvMatrixStack.popMatrix();
+	myEngine.updateMvMatrix();
+}
+
+void drawLune()
+{
+	myEngine.mvMatrixStack.pushMatrix();
+	myEngine.mvMatrixStack.addTranslation({20.f, 20.f, 15.f});
+	myEngine.mvMatrixStack.addHomothety({1.5f, 1.5f, 1.5f});
+	myEngine.updateMvMatrix();
+	myEngine.setFlatColor(0.9f, 0.9f, 0.7f);
+	soleil->draw(); // on va dire que petit soleil = lune
+	myEngine.mvMatrixStack.popMatrix();
+	myEngine.updateMvMatrix();
+}
 
 void drawScene()
 {
@@ -66,8 +113,52 @@ void drawScene()
 		STP3D::Vector3D(cam_x + dir_x, cam_y + dir_y, cam_z),
 		STP3D::Vector3D(0.f, 0.f, 1.f));
 
+	if (lightingMode)
+	{
+		glClearColor(0.03f, 0.03f, 0.12f, 1.0f); // nuit
+	}
+	else
+	{
+		glClearColor(0.5f, 0.7f, 0.9f, 1.0f); // jour
+	}
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 	myEngine.updateMvMatrix();
+
+	if (lightingEnabled)
+	{
+		myEngine.switchToPhongShading();
+
+		if (lightingMode)
+		{
+			// night
+			myEngine.setLightPosition({0.0f, 0.0f, 100.0f, 0.0f}, 0);
+			myEngine.setLightIntensity({0.5f, 0.5f, 0.5f}, 0);
+		}
+		else
+		{
+			// day
+			myEngine.setLightPosition({5.0f, -5.0f, 8.0f, 0.0f}, 0);
+			myEngine.setLightIntensity({1.4f, 1.2f, 0.9f}, 0);
+		}
+		// Soleil ou lune en flat
+		myEngine.switchToFlatShading();
+		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
+		myEngine.updateMvMatrix();
+		if (lightingMode)
+			drawLune();
+		else
+			drawSoleil();
+
+		myEngine.switchToPhongShading();
+		glUniformMatrix4fv(glGetUniformLocation(myEngine.idShader[1], "viewMatrix"), 1, GL_FALSE, viewMatrix.mat);
+	}
+	else
+	{
+		myEngine.switchToFlatShading();
+	}
 
 	drawGround();
 	drawRails();
@@ -75,13 +166,16 @@ void drawScene()
 	drawRandomSapins();
 	drawRandomShrooms();
 
+	myEngine.mvMatrixStack.loadTransformation(viewMatrix);
+	myEngine.updateMvMatrix();
+
 	animate += 0.02f;
-	armAnimationSlow = sin(animate*3) * 0.8f; // pour que ca fasse des allé retour entre 0.8 et -0.8
-	armAnimationFast = sin(animate*10) * 0.8f;	// pour que ca fasse des allé retour + rapide
+	armAnimationSlow = sin(animate * 3) * 0.8f;	 // pour que ca fasse des allé retour entre 0.8 et -0.8
+	armAnimationFast = sin(animate * 10) * 0.8f; // pour que ca fasse des allé retour + rapide
 
 	myEngine.mvMatrixStack.pushMatrix();
 	myEngine.mvMatrixStack.addTranslation({-19, 5, 0});
-	myEngine.mvMatrixStack.addRotation(M_PI/2, {0, 0, 1});
+	myEngine.mvMatrixStack.addRotation(M_PI / 2, {0, 0, 1});
 	myEngine.mvMatrixStack.addRotation(M_PI, {0, 0, 1});
 	myEngine.mvMatrixStack.addHomothety({0.8, 0.8, 0.8});
 	drawKyle(armAnimationSlow);

@@ -52,7 +52,15 @@ void onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int /*mods
 	case GLFW_KEY_P:
 		if (is_pressed)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
+		break;
+	case GLFW_KEY_N:
+		if (is_pressed)
+			lightingMode = !lightingMode;
+		break;
+		case GLFW_KEY_F:
+		if (is_pressed)
+			lightingEnabled = !lightingEnabled;
+		break;
 	default:
 		break;
 	}
@@ -94,19 +102,35 @@ void onMouseMove(GLFWwindow * /*window*/, double xpos, double ypos)
 	cam_angle -= (float)dx * 0.2f; //- sinon c'est inversé
 }
 
-void processMovement(GLFWwindow* window, float dt)
+void processMovement(GLFWwindow *window, float dt)
 {
-    float speed = 10.f * dt;
-    float rad   = cam_angle * M_PI / 180.f;
-    float fx = cosf(rad); // forward X
-    float fy = sinf(rad); // forward Y
-    float sx = -fy; // strafe X (perpendiculaire)
-    float sy =  fx; // strafe Y
+	float speed = 10.f * dt;
+	float rad = cam_angle * M_PI / 180.f;
+	float fx = cosf(rad); // forward X
+	float fy = sinf(rad); // forward Y
+	float sx = -fy;		  // strafe X (perpendiculaire)
+	float sy = fx;		  // strafe Y
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) { cam_x += fx*speed; cam_y += fy*speed; } // Z azerty
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) { cam_x -= fx*speed; cam_y -= fy*speed; } // S azerty
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) { cam_x += sx*speed; cam_y += sy*speed; } // Q azerty
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { cam_x -= sx*speed; cam_y -= sy*speed; } // D azerty
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		cam_x += fx * speed;
+		cam_y += fy * speed;
+	} // Z azerty
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		cam_x -= fx * speed;
+		cam_y -= fy * speed;
+	} // S azerty
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		cam_x += sx * speed;
+		cam_y += sy * speed;
+	} // Q azerty
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		cam_x -= sx * speed;
+		cam_y -= sy * speed;
+	} // D azerty
 }
 
 // Ajouter aussi le scroll pour le zoom
@@ -116,16 +140,17 @@ void processMovement(GLFWwindow* window, float dt)
 // 	if (dist_zoom < 1.0f)
 // 		dist_zoom = 1.0f;
 // }
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
-	//initialisation de l'argument le nom du fichier JSON à charger
-	 if (argc < 2) {
-        std::cerr << "erreur : donnez un fichier JSON" << std::endl;
-        std::cerr << "usage : " << argv[0] << " scene.json" << std::endl;
-        return -1;
-    }
+	// initialisation de l'argument le nom du fichier JSON à charger
+	if (argc < 2)
+	{
+		std::cerr << "erreur : donnez un fichier JSON" << std::endl;
+		std::cerr << "usage : " << argv[0] << " scene.json" << std::endl;
+		return -1;
+	}
 
-    std::string jsonFile = argv[1];
+	std::string jsonFile = argv[1];
 	/* GLFW initialisation */
 	GLFWwindow *window;
 	if (!glfwInit())
@@ -175,7 +200,7 @@ int main(int argc, char ** argv)
 	CHECK_GL;
 
 	initScene(jsonFile);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //pour ne plus voir le curseur dc la souris
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // pour ne plus voir le curseur dc la souris
 	glEnable(GL_DEPTH_TEST);
 	double elapsedTime{0.0};
 
