@@ -14,7 +14,9 @@ float cam_y = 5.f;
 float cam_z = 5.f;
 float cam_angle = 0.f;
 bool lightingMode = false;
-static bool lightsInitialized = false;
+bool phareOn = false;
+bool flatMode = false;
+bool lightsInitialized = false;
 GLBI_Engine myEngine;
 Circuit circuit;
 
@@ -67,41 +69,93 @@ void drawScene()
 			STP3D::Vector3D(cam_x + dir_x, cam_y + dir_y, cam_z),
 			STP3D::Vector3D(0.f, 0.f, 1.f));
 
+	// Position phare
+	int idx = circuit.train_pos;
+	int next = (idx + 1) % (int)circuit.path.size();
+	float posX = circuit.path[idx].first * circuit.size_grid + circuit.size_grid / 2.f;
+	float posY = circuit.path[idx].second * circuit.size_grid + circuit.size_grid / 2.f;
+	float dx = circuit.path[next].first - circuit.path[idx].first;
+	float dy = circuit.path[next].second - circuit.path[idx].second;
+	float angle = atan2f(dy, dx);
+	float phareX = posX + dx * 12.f + cosf(angle) * 5.f;
+	float phareY = posY + dy * 12.f + sinf(angle) * 5.f;
+
+	// Reset lumières si changement de mode jour/nuit
+	static bool lastLightingMode = lightingMode;
+	if (lastLightingMode != lightingMode)
+	{
+		lightsInitialized = false;
+		if (!lightingMode)
+			phareOn = false;
+		lastLightingMode = lightingMode;
+	}
+
 	if (lightingMode)
 	{
-		glClearColor(0.05f, 0.05f, 0.15f, 1.0f);
+		// === NUIT ===
+		glClearColor(0.02f, 0.02f, 0.08f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		myEngine.switchToPhongShading();
-		glUniformMatrix4fv(glGetUniformLocation(myEngine.idShader[1], "viewMatrix"), 1, GL_FALSE, viewMatrix.mat);
 
 		if (!lightsInitialized)
 		{
+			// Lumière 0 : lune froide très faible
 			myEngine.addALight(
-					STP3D::Vector4D(30.f, 30.f, 25.f, 0.f),
-					STP3D::Vector3D(20.f, 20.f, 20.f));
-			myEngine.setShininess(16.f);
+					STP3D::Vector4D(0.f, 0.f, 1.f, 0.f),
+					STP3D::Vector3D(0.12f, 0.12f, 0.2f));
+
+			// Lumière 1 : phare du train (jaune doux, pas trop fort)
+			myEngine.addALight(
+					STP3D::Vector4D(phareX, phareY, 3.f, 1.f),
+					phareOn
+							? STP3D::Vector3D(3.f, 3.f, 2.f)
+							: STP3D::Vector3D(0.f, 0.f, 0.f));
+
+			// Lumière 2 : ambiance très faible depuis le bas
+			myEngine.addALight(
+					STP3D::Vector4D(0.f, 0.f, -1.f, 0.f),
+					STP3D::Vector3D(0.05f, 0.05f, 0.08f));
+
+			// Lumière 3 : latérale gauche
+			myEngine.addALight(
+					STP3D::Vector4D(1.f, 0.f, 0.f, 0.f),
+					STP3D::Vector3D(0.04f, 0.04f, 0.07f));
+
+			// Lumière 4 : latérale droite
+			myEngine.addALight(
+					STP3D::Vector4D(-1.f, 0.f, 0.f, 0.f),
+					STP3D::Vector3D(0.04f, 0.04f, 0.07f));
+
+			myEngine.setShininess(8.f);
+			myEngine.setSpecularColor(STP3D::Vector3D(0.3f, 0.3f, 0.3f));
+			myEngine.setAttenuationFactor(STP3D::Vector3D(1.f, 0.05f, 0.005f));
 			lightsInitialized = true;
 		}
 
-		int idx = circuit.train_pos;
-		int next = (idx + 1) % (int)circuit.path.size();
-		float posX = circuit.path[idx].first * circuit.size_grid + circuit.size_grid / 2.f;
-		float posY = circuit.path[idx].second * circuit.size_grid + circuit.size_grid / 2.f;
-		float dx = circuit.path[next].first - circuit.path[idx].first;
-		float dy = circuit.path[next].second - circuit.path[idx].second;
-		float angle = atan2f(dy, dx);
+		// Mise à jour phare chaque frame
+		myEngine.setLightPosition(
+				STP3D::Vector4D(phareX, phareY, 3.f, 1.f), 1);
+		myEngine.setLightIntensity(
+				phareOn
+						? STP3D::Vector3D(3.f, 3.f, 2.f)
+						: STP3D::Vector3D(0.f, 0.f, 0.f),
+				1);
 
-		myEngine.setLightPosition(STP3D::Vector4D(
-																	posX + dx * 12.f + cosf(angle) * 5.f,
-																	posY + dy * 12.f + sinf(angle) * 5.f,
-																	3.f, 1.f),
-															1);
+		// Sol en flat vert pur la nuit
+		myEngine.switchToFlatShading();
+		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
+		myEngine.updateMvMatrix();
+		drawGround();
 
+		if (!flatMode)
+		{
+			myEngine.switchToPhongShading();
+			glUniformMatrix4fv(
+					glGetUniformLocation(myEngine.idShader[1], "viewMatrix"),
+					1, GL_FALSE, viewMatrix.mat);
+		}
 		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 		myEngine.updateMvMatrix();
 
-		drawGround();
 		drawRails();
 		drawStation();
 		drawRandomSapins();
@@ -111,26 +165,96 @@ void drawScene()
 		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 		myEngine.updateMvMatrix();
 		drawLune();
-		myEngine.switchToPhongShading();
-		glUniformMatrix4fv(glGetUniformLocation(myEngine.idShader[1], "viewMatrix"), 1, GL_FALSE, viewMatrix.mat);
+
+		if (!flatMode)
+		{
+			myEngine.switchToPhongShading();
+			glUniformMatrix4fv(
+					glGetUniformLocation(myEngine.idShader[1], "viewMatrix"),
+					1, GL_FALSE, viewMatrix.mat);
+		}
 		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 		myEngine.updateMvMatrix();
 	}
 	else
 	{
+		// === JOUR ===
 		glClearColor(0.5f, 0.7f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		if (!lightsInitialized)
+		{
+			// Lumière 0 : soleil zénith blanc, modéré
+			myEngine.addALight(
+					STP3D::Vector4D(0.f, 0.f, 1.f, 0.f),
+					STP3D::Vector3D(0.7f, 0.7f, 0.7f));
+
+			// Lumière 1 : fill bas (ciel réfléchi)
+			myEngine.addALight(
+					STP3D::Vector4D(0.f, 0.f, -1.f, 0.f),
+					STP3D::Vector3D(0.25f, 0.25f, 0.25f));
+
+			// Lumière 2 : fill avant
+			myEngine.addALight(
+					STP3D::Vector4D(0.f, 1.f, 0.f, 0.f),
+					STP3D::Vector3D(0.2f, 0.2f, 0.2f));
+
+			// Lumière 3 : fill arrière
+			myEngine.addALight(
+					STP3D::Vector4D(0.f, -1.f, 0.f, 0.f),
+					STP3D::Vector3D(0.2f, 0.2f, 0.2f));
+
+			// Lumière 4 : fill droite
+			myEngine.addALight(
+					STP3D::Vector4D(1.f, 0.f, 0.f, 0.f),
+					STP3D::Vector3D(0.15f, 0.15f, 0.15f));
+
+			// Lumière 5 : fill gauche
+			myEngine.addALight(
+					STP3D::Vector4D(-1.f, 0.f, 0.f, 0.f),
+					STP3D::Vector3D(0.15f, 0.15f, 0.15f));
+
+			myEngine.setShininess(4.f);
+			myEngine.setSpecularColor(STP3D::Vector3D(1.f, 1.f, 1.f));
+			myEngine.setAttenuationFactor(STP3D::Vector3D(1.f, 0.0f, 0.0f));
+			lightsInitialized = true;
+		}
+
+		// Sol en flat vert sans ombres
 		myEngine.switchToFlatShading();
 		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
 		myEngine.updateMvMatrix();
-
 		drawGround();
+
+		if (!flatMode)
+		{
+			myEngine.switchToPhongShading();
+			glUniformMatrix4fv(
+					glGetUniformLocation(myEngine.idShader[1], "viewMatrix"),
+					1, GL_FALSE, viewMatrix.mat);
+		}
+		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
+		myEngine.updateMvMatrix();
+
 		drawRails();
 		drawStation();
 		drawRandomSapins();
 		drawRandomShrooms();
+
+		myEngine.switchToFlatShading();
+		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
+		myEngine.updateMvMatrix();
 		drawSoleil();
+
+		if (!flatMode)
+		{
+			myEngine.switchToPhongShading();
+			glUniformMatrix4fv(
+					glGetUniformLocation(myEngine.idShader[1], "viewMatrix"),
+					1, GL_FALSE, viewMatrix.mat);
+		}
+		myEngine.mvMatrixStack.loadTransformation(viewMatrix);
+		myEngine.updateMvMatrix();
 	}
 
 	animate += 0.02f;

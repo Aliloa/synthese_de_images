@@ -16,8 +16,10 @@ extern float cam_x;
 extern float cam_y;
 extern float cam_z;
 extern float cam_angle;
-extern bool lightingMode; // false => flat true => réaliste
-
+extern bool lightingMode;
+extern bool phareOn;
+extern bool flatMode;
+extern bool lightsInitialized;
 struct Circuit
 {
     int size_grid;

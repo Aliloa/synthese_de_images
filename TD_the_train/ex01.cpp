@@ -8,7 +8,6 @@
 using namespace glbasimac;
 using namespace STP3D;
 
-extern bool lightingMode;
 static bool mousePressed = false;
 static double lastMouseX = 0.0;
 static double lastMouseY = 0.0;
@@ -53,12 +52,29 @@ void onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int /*mods
 	case GLFW_KEY_P:
 		if (is_pressed)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+
+	case GLFW_KEY_N:
+		if (is_pressed)
+		{
+			lightingMode = !lightingMode;
+			// Ne touche PAS phareOn ici, le drawScene gère l'extinction en jour
+		}
+		break;
+	case GLFW_KEY_F:									// ← F pour le phare du train
+		if (is_pressed && lightingMode) // uniquement en mode nuit
+			phareOn = !phareOn;
+		break;
+
+	case GLFW_KEY_G: // ← G pour flat/phong
+		if (is_pressed)
+		{
+			flatMode = !flatMode;
+			lightsInitialized = false;
+		}
+		break;
 
 	default:
-		break;
-	case GLFW_KEY_F:
-		if (is_pressed)
-			lightingMode = !lightingMode;
 		break;
 	}
 }
