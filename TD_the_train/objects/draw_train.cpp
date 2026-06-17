@@ -220,12 +220,12 @@ void drawTrain()
   float angle = atan2f(dy, dx);
 
   myEngine.mvMatrixStack.pushMatrix();
-  myEngine.mvMatrixStack.addTranslation({posX + dx * 12.f, posY + dy * 12.f, 1.f});
+  myEngine.mvMatrixStack.addTranslation({posX + dx * 25.f, posY + dy * 25.f, 1.f});
   myEngine.mvMatrixStack.addRotation(angle, {0, 0, 1});
 
   //lumiere
-  float trainX = posX + dx * 12.f;
-  float trainY = posY + dy * 12.f;
+  float trainX = posX + dx * 25.f;
+  float trainY = posY + dy * 25.f;
 
   float phareX = trainX + 4.f * cos(angle);
   float phareY = trainY + 4.f * sin(angle);
