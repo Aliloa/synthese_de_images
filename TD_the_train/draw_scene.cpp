@@ -54,7 +54,7 @@ void initScene(const std::string &jsonFile)
 	myEngine.switchToPhongShading();
 
 	// Light init
-	myEngine.addALight({0.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f});
+	myEngine.addALight({5.0f, -5.0f, 8.0f, 0.0f}, {0.0f, 0.0f, 0.0f});
 	myEngine.setLightPosition({5.0f, -5.0f, 8.0f, 0.0f}, 0); // soleil/lune
 
 	// fixe param
@@ -101,13 +101,11 @@ void drawScene()
 		if (lightingMode)
 		{
 			// night
-			myEngine.setLightPosition({0.0f, 0.0f, 100.0f, 0.0f}, 0);
-			myEngine.setLightIntensity({0.5f, 0.5f, 0.5f}, 0);
+			myEngine.setLightIntensity({0.3f, 0.3f, 0.3f}, 0);
 		}
 		else
 		{
 			// day
-			myEngine.setLightPosition({5.0f, -5.0f, 8.0f, 0.0f}, 0);
 			myEngine.setLightIntensity({1.4f, 1.2f, 0.9f}, 0);
 		}
 		// Soleil ou lune en flat
