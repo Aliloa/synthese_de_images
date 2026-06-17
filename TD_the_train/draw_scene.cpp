@@ -13,17 +13,12 @@ float cam_x = 0.f;
 float cam_y = 5.f;
 float cam_z = 5.f;
 float cam_angle = 0.f;
-bool lightingMode = false;
-bool phareOn = false;
-bool flatMode = false;
-bool lightsInitialized = false;
 GLBI_Engine myEngine;
 Circuit circuit;
 
 // lumiere
 bool lightingMode = false; // false = jour, true = nuit
 bool lightingEnabled{false};
-IndexedMesh *soleil;
 
 void loadCircuit(const std::string &filename)
 {
@@ -48,9 +43,6 @@ void loadCircuit(const std::string &filename)
 void initScene(const std::string &jsonFile)
 {
 	loadCircuit(jsonFile);
-	// std::cout << "size_grid: " << circuit.size_grid << std::endl;
-	// for (auto &point : circuit.path)
-	// 	std::cout << "  " << point.first << ", " << point.second << std::endl;
 
 	initGround();
 	initRail();
@@ -71,39 +63,11 @@ void initScene(const std::string &jsonFile)
 	myEngine.setAttenuationFactor({1.0f, 0.05f, 0.01f});
 
 	myEngine.switchToFlatShading();
-
-	// soleil et lune
-	soleil = basicSphere(1.0f);
-	soleil->createVAO();
 }
 
 float animate = 0.0f;
 float armAnimationSlow = 0.0f;
 float armAnimationFast = 0.0f;
-
-void drawSoleil()
-{
-	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.mvMatrixStack.addTranslation({20.f, 20.f, 15.f});
-	myEngine.mvMatrixStack.addHomothety({2.f, 2.f, 2.f});
-	myEngine.updateMvMatrix();
-	myEngine.setFlatColor(1.0f, 0.9f, 0.2f);
-	soleil->draw();
-	myEngine.mvMatrixStack.popMatrix();
-	myEngine.updateMvMatrix();
-}
-
-void drawLune()
-{
-	myEngine.mvMatrixStack.pushMatrix();
-	myEngine.mvMatrixStack.addTranslation({20.f, 20.f, 15.f});
-	myEngine.mvMatrixStack.addHomothety({1.5f, 1.5f, 1.5f});
-	myEngine.updateMvMatrix();
-	myEngine.setFlatColor(0.9f, 0.9f, 0.7f);
-	soleil->draw(); // on va dire que petit soleil = lune
-	myEngine.mvMatrixStack.popMatrix();
-	myEngine.updateMvMatrix();
-}
 
 void drawScene()
 {
