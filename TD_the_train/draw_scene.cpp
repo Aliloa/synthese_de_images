@@ -55,7 +55,7 @@ void initScene(const std::string &jsonFile)
 
 	// Light init
 	myEngine.addALight({0.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f});
-	myEngine.setLightPosition({5.0f, -5.0f, 8.0f, 0.0f}, 0); // soleil
+	myEngine.setLightPosition({5.0f, -5.0f, 8.0f, 0.0f}, 0); // soleil/lune
 
 	// fixe param
 	myEngine.setShininess(8.0f);
@@ -76,9 +76,9 @@ void drawScene()
 	float dir_y = sinf(rad);
 
 	STP3D::Matrix4D viewMatrix = STP3D::Matrix4D::lookAt(
-			STP3D::Vector3D(cam_x, cam_y, cam_z),
-			STP3D::Vector3D(cam_x + dir_x, cam_y + dir_y, cam_z),
-			STP3D::Vector3D(0.f, 0.f, 1.f));
+		STP3D::Vector3D(cam_x, cam_y, cam_z),
+		STP3D::Vector3D(cam_x + dir_x, cam_y + dir_y, cam_z),
+		STP3D::Vector3D(0.f, 0.f, 1.f));
 
 	if (lightingMode)
 	{

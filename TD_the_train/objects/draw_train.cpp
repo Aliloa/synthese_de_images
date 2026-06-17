@@ -26,6 +26,14 @@ void initTrain()
   cheminee->createVAO();
   wagon->createVAO();
 
+  // lumiere
+  myEngine.switchToPhongShading();
+
+  // lumière
+  // Phare du train
+  myEngine.addALight({0.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f});
+  myEngine.setLightIntensity({2.0f, 1.8f, 1.0f}, 1);
+
   // textures
   // wagon rouge
   textureMetalRouge.createTexture();
@@ -145,6 +153,9 @@ void drawLocomotive()
   myEngine.mvMatrixStack.pushMatrix();
   myEngine.setFlatColor(1.f, 1.f, 0.2f);
   myEngine.mvMatrixStack.addTranslation({4.f, 0.f, 2.f});
+  // position de la lumière
+  myEngine.updateMvMatrix();
+
   myEngine.mvMatrixStack.addHomothety({0.5f, 0.5f, 0.5f});
   myEngine.updateMvMatrix();
   roue->draw();
@@ -211,6 +222,16 @@ void drawTrain()
   myEngine.mvMatrixStack.pushMatrix();
   myEngine.mvMatrixStack.addTranslation({posX + dx * 12.f, posY + dy * 12.f, 1.f});
   myEngine.mvMatrixStack.addRotation(angle, {0, 0, 1});
+
+  //lumiere
+  float trainX = posX + dx * 12.f;
+  float trainY = posY + dy * 12.f;
+
+  float phareX = trainX + 4.f * cos(angle);
+  float phareY = trainY + 4.f * sin(angle);
+  float phareZ = 1.f + 2.f;
+
+  myEngine.setLightPosition({phareX, phareY, phareZ, 1.f}, 1);
 
   drawLocomotive();
   drawWagon(-8.5f);
