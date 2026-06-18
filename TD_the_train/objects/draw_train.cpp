@@ -227,8 +227,8 @@ void drawTrain()
   float trainX = posX + dx * 25.f;
   float trainY = posY + dy * 25.f;
 
-  float phareX = trainX + 4.f * cos(angle);
-  float phareY = trainY + 4.f * sin(angle);
+  float phareX = trainX + circuit.size_grid * cos(angle);
+  float phareY = trainY + circuit.size_grid * sin(angle);
   float phareZ = 1.f + 2.f;
 
   myEngine.setLightPosition({phareX, phareY, phareZ, 1.f}, 1);
