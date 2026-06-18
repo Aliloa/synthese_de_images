@@ -15,7 +15,7 @@ cmake --build .
 - Sous Windows:
 cd ../build ; cmake --build . ; cd ../bin ; ./TD_the_train_ex01.exe ../TD_the_train/circuit.json
 
--Sous Linux :
+- Sous Linux :
 cd ../build ; cmake --build . ; cd ../bin ; ./TD_the_train_ex01 ../TD_the_train/circuit.json
 
 # Touches utiles:

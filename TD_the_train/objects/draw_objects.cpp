@@ -152,9 +152,9 @@ void drawMushroom()
 }
 
 // Zone ou y a la gare pour éviter de mettre des objets par dessus
-bool zoneGare(int x, int z)
+bool zoneGare(int x, int y)
 {
-    return (x > -40 && x < 12 && z > -22 && z < 22);
+    return (x > -40 && x < 12 && y > -22 && y < 32);
 }
 
 void drawRandomSapins()
