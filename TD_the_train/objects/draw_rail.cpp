@@ -125,9 +125,13 @@ void drawRailCourbeInt(float rayon)
     fDroite.changeNature(GL_TRIANGLE_STRIP);
 
     myEngine.setFlatColor(0.706f, 0.753f, 0.761f);
+    myEngine.setNormalForConvex2DShape(Vector3D(0.0f, 0.0f, 1.0f));
     fHaut.drawShape();
+    myEngine.setNormalForConvex2DShape(Vector3D(0.0f, 0.0f, -1.0f));
     fBas.drawShape();
+    myEngine.setNormalForConvex2DShape(Vector3D(-1.0f, 0.0f, 0.0f));
     fGauche.drawShape();
+    myEngine.setNormalForConvex2DShape(Vector3D(1.0f, 0.0f, 0.0f));
     fDroite.drawShape();
 }
 

@@ -43,6 +43,7 @@ void drawGround()
             {
                 myEngine.setFlatColor(0.267, 0.412, 0.227); // vert foncé
             }
+            myEngine.setNormalForConvex2DShape(Vector3D(0.0f, 0.0f, 1.0f));
             ground.drawShape();
 
             myEngine.mvMatrixStack.popMatrix();

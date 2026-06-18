@@ -20,10 +20,14 @@ float angle = angleStart + i * angleStep;
 		float posX = (POS_X_RAIL1 - 0.6) * sin(angle);
 
 Pour lancer le programme : (depuis le dossier bin)
-./TD_the_train_ex01.exe ../TD_the_train/circuit.json
+Pour Windows : ./TD_the_train_ex01.exe ../TD_the_train/circuit.json
+
+Pour Linux : ./TD_the_train_ex01 ../TD_the_train/circuit.json
 
 Pour rebuild : (depuis le dossier build)
 cmake --build .
 
 Tout en 1 ligne:
-cd ../build ; cmake --build . ; cd ../bin ; ./TD_the_train_ex01.exe ../TD_the_train/circuit.json
+Pour Windows : cd ../build ; cmake --build . ; cd ../bin ; ./TD_the_train_ex01.exe ../TD_the_train/circuit.json
+
+Pour Linux : cd ../build ; cmake --build . ; cd ../bin ; ./TD_the_train_ex01 ../TD_the_train/circuit.json
